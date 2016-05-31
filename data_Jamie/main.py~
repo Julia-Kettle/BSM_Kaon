@@ -1,0 +1,38 @@
+import nonlinearfit
+import numpy as np
+import random
+import readfiles as rf
+import resampling as rsamp
+import setup
+
+"""
+Jamie's data 
+in dataJamie/(latticepts)/(Amptype)_mu(msealight)_mq(mql=msealight)_ms(mvalstrange)_(ibetatype)
+latticepts = 24 or 32
+
+"""
+
+latticedim = ['24','32']
+amp_par = ['MK_4CHAN','FK_4CHAN']
+conv = 2 #l-s & s-s
+name_kin = ['E','gg','qq','qg''gq']
+name_scheme = ['MOM','ms']
+name_basis = ['Lattice basis', 'SUSY basis']
+#set up 2d matix of tex names later
+
+for kin in range(len(name_kin)):
+    for scheme in range(len(name_scheme)):
+        for basis in range(len(name_basis)):
+            params = []
+            for lattice in range(len(latticedim)): # should I move this for loop to outside? params stay same during. Or do a separate loop to set up the params classes?
+
+                params.append(setup.Params(latticedim[lattice]))
+                for i_msea in params[lattice].m_sea_l:
+                    m_val1, m_val2 = setup.masses(params[lattice].m_val_s,i_msea, conv)
+                    n_mval1 = len(m_val1)
+                    '''
+                    for i_mval1 in n_mval1:
+                        for i_mval2 in n_mval2:
+                            filename = './data_Jamie/' + latticedim[] + '/' + amp_par[] + '/_mu' + str(m_sea_l[])+ '_mq' +  str(i_mval2) + '_ms' + str(i_mval1) + basend[]
+                    '''
+            print params

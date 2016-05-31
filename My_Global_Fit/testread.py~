@@ -1,0 +1,8 @@
+f = open("tes_9.22","rb")
+try:
+    byte = f.read(1)
+    while byte != "":
+        print byte
+        byte = f.read(1)
+finally:
+    f.close()

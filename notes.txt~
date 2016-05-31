@@ -1,0 +1,20 @@
+loop through kinematics, scheme, basis
+  read bootstraps
+  read Jamies data
+  compute the pion amplitude
+  read remaining data
+  renormalise
+  globalfit
+
+
+
+global fit needs to happen simult for both lattices
+
+
+
+Incorporating the new physical pnt data. Do I need the bootstraps? 
+They are used in the global fit, so yes I do. 
+Need to print them out from the fitting process?
+
+
+QDP m0,n1@bgqfe4 fatal error:  BinaryFileReader: error opening file /dirac2/work/dp008/dp008/DWF/2+1f/48nt96/IWASAKI/ls12/M1.8/b2.37/ms0.019/ml0.002/ukrun_jun_2015/results/4040/bag/bag_ms_0.02144_Z2Wall_LL_0.0_t2_twist_0_0_0_ml_0.002144_Z2Wall_LL_0.0_t2_twist_0_0_0_ms_0.02144_Z2Wall_LL_0.0_t44_twist_0_0_0_ml_0.002144_Z2Wall_LL_0.0_t44_twist_0_0_0.4040.bin
