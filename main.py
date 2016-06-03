@@ -49,6 +49,8 @@ def return_Jamie_data(iBeta,iParams,nboot):
     	b_FK = np.zeros([1,len(msea),len(ms)+1,1,nboot+1])
     	b_MK = np.zeros([1,len(msea),len(ms)+1,1,nboot+1])
     	b_mpsq_fpsq = np.zeros([1,len(msea),len(ms)+1,1,nboot+1])
+
+	
     
     	for i in range(len(msea)): 
         	mv1 = [deepcopy(msea[i])] #1st valence l + sea
@@ -83,6 +85,16 @@ def return_3pts(iBeta,iParams,nboots):
    	matel_3p_rat = rf.read_results(filename,4,len(msea),len(ms),1,nboot+1) #3pt1/3pti ~ R
     	return matel_3p_2p, matel_3p, matel_3p_rat
 	###########################################################################################
+
+def return_myBag(iBeta,iParams,nboots):
+	print " Reading Physical point Bag data..."
+	ms  = deepcopy(iParams.m_val_s)
+	msea = deepcopy(iParams.m_sea_l)
+	for ic in [1,2, 3, 4, 5]:
+		filename = 'Julia_data/bag/s' + str(ms) + '-l'+ str(msea) + '/dt40/s'+ str(ms) + '-l' + str(msea) + '-channel'+ic+'.dat'
+		print filename
+		rf.read_bootstraps(filename)
+
 
 
 latticedim = ['24','32']
@@ -146,6 +158,8 @@ for iBeta in range(2): #loop through lattice
 		b_MK, b_FK, b_mpsq_fpsq = return_Jamie_data(iBeta,iParams,nboot)
 		matel_3p_2p, matel_3p, matel_3p_rat = return_3pts(iBeta,iParams,nboot)
 	else:
+
+		return_myBag(iBeta,iParams,nboot)
 		#read all the new physical files here
 		#need to store the bootstraps first - txt files should do
     	####################################################################################################################################################
