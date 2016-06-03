@@ -2,27 +2,30 @@ import numpy as np
                 
                 
 def calcBag(matel_3p_2p):
-    dim = np.shape(matel_3p_2p)
-    bag = np.zeros(dim)
-    for i in range(dim[0]):
-        for j in range(dim[1]):
-            for k in range(dim[2]):
-                for l in range(dim[3]):
-                    for m in range(dim[4]):
-                        bag[i,j,k,l,m] = 3*8*matel_3p_2p[i,j,k,l,m]
-    return bag
+    	dim = np.shape(matel_3p_2p)
+    	bag = np.zeros(dim)
+	#Ninv = [3.0/8, 3.0/4, -0.5, 3.0/5, 1.0]
+	Ninv = [3.0/8, 3.0/8, 3.0/8, 3.0/8, 3.0/8]
 
-    '''
-    Bsm = <K|O1|K>/((8/3)*2(Mk*Fk)^2) = 3pt/(8/3)*2pt*2pt
-    Bbsmi = <K|Oi|K> / Ni*(sqrt(2)FkMk^2/(ms+md))^2
+    	for i in range(dim[0]):
+		print i
+        	for j in range(dim[1]):
+            		for k in range(dim[2]):
+                		for l in range(dim[3]):
+                    			for m in range(dim[4]):
+                        			bag[i,j,k,l,m] = Ninv[i]*matel_3p_2p[i,j,k,l,m]
+					print i, j, k, l, bag[i,j,k,l,-1], matel_3p_2p[i,j,k,l,-1], Ninv[i]
+
+    	return bag
+
+    	'''
+    	Bsm = <K|O1|K>/((8/3)*2(Mk*Fk)^2) = 3pt/(8/3)*2pt*2pt
+    	Bbsmi = <K|Oi|K> / Ni*(sqrt(2)FkMk^2/(ms+md))^2
     
-    R = (Fk/Mk)^2_exper * (Mk/Fk)^2*<P|O1|P>/<P|Oi|P>
+    	R = (Fk/Mk)^2_exper * (Mk/Fk)^2*<P|O1|P>/<P|Oi|P>
 
-    Gi are the golden combinations - no logs so chiral extrapolation easier
-
-    
-
-    '''
+    	Gi are the golden combinations - no logs so chiral extrapolation easier
+    	'''
 
 def calc_R(Fk,Mk,Rat):
     """
