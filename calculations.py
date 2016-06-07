@@ -5,16 +5,15 @@ def calcBag(matel_3p_2p):
     	dim = np.shape(matel_3p_2p)
     	bag = np.zeros(dim)
 	#Ninv = [3.0/8, 3.0/4, -0.5, 3.0/5, 1.0]
-	Ninv = [3.0/8, 3.0/8, 3.0/8, 3.0/8, 3.0/8]
+	#Ninv = [3.0/8, 3.0/4, -0.5, 3.0/5, 1.0]
+	N = [8.0/3, 4.0/3, -2.0, 5.0/3, 1.0]	
 
     	for i in range(dim[0]):
-		print i
         	for j in range(dim[1]):
             		for k in range(dim[2]):
                 		for l in range(dim[3]):
                     			for m in range(dim[4]):
-                        			bag[i,j,k,l,m] = Ninv[i]*matel_3p_2p[i,j,k,l,m]
-					print i, j, k, l, bag[i,j,k,l,-1], matel_3p_2p[i,j,k,l,-1], Ninv[i]
+                        			bag[i,j,k,l,m] = matel_3p_2p[i,j,k,l,m]/N[i]
 
     	return bag
 
@@ -43,10 +42,6 @@ def calc_R(Fk,Mk,Rat):
     Fkphys = 156.2*pow(10,-3)
     #Mkphys = 139.57018
     #Fkphys=130
-    #print "R"
-    #print "R"
-    #print "R"
-    #print "R"
     for i in range(dim[1]):
         for j in range(dim[2]):
             for k in range(dim[3]):
@@ -70,7 +65,7 @@ def calc_G(B):
         G[0][i] = B[2][i]/B[3][i] #23
         G[1][i] = B[4][i]/B[5][i] #45
         G[2][i] = B[2][i]*B[4][i] #24
-        G[3][i] = B[12][i]/B[1][i] #21
+        G[3][i] = B[2][i]/B[1][i] #21
         G[4][i] = B[3][i]/B[1][i] #31
         
     return G

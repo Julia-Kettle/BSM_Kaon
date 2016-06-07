@@ -67,6 +67,7 @@ def return_Jamie_data(iBeta,iParams,nboot):
                     			b_FK[0,i,j,k,l] = dataFK[l]
                     			b_MK[0,i,j,k,l] = dataMK[l]
                     			b_mpsq_fpsq[0,i,j,k,l]= pow((b_MK[0,i,j,k,l]/(4*pi*b_FK[0,i,j,k,l])),2)
+	print "Done"+"\n"
 	return b_FK, b_MK, b_mpsq_fpsq
     ######################################################################################################################################################
 
@@ -83,7 +84,8 @@ def return_3pts(iBeta,iParams,nboots):
     	matel_3p=rf.read_results(filename,5,len(msea),len(ms),1,nboot+1) #3pt
     	filename = 'data/boot_matel_'+latticedim[iBeta]+'cubed_IW_3p_rat.txt'
    	matel_3p_rat = rf.read_results(filename,4,len(msea),len(ms),1,nboot+1) #3pt1/3pti ~ R
-    	return matel_3p_2p, matel_3p, matel_3p_rat
+    	print "Done" + "\n"
+	return matel_3p_2p, matel_3p, matel_3p_rat
 	###########################################################################################
 
 def return_myBag(iBeta,iParams,nboots):
@@ -92,18 +94,25 @@ def return_myBag(iBeta,iParams,nboots):
 	msea = deepcopy(iParams.m_sea_l)
 	meson = 's' + str(ms[0]) + '-l'+ str(msea[0])
 	lat = iParams.latticename
+	#Ninv = [3.0/8,3.0/4,-0.5,3.0/5,1.0] #Need to remove the scaling for consistency with Nicolas' data - is added in later. 
+	Ninv = [3.0/8,1.0,1.0,1.0,1.0]
 	B = np.zeros([5,1,1,1,nboots+1])
 	b_MK = np.zeros([1,1,1,1,nboots+1])
 	b_FK =  np.zeros([1,1,1,1,nboots+1])
 	b_mpsq_fpsq = np.zeros([1,1,1,1,nboots+1])
-	for j in range(nboots+1): #Temporarily fill with the true phys data, before we have run and fit the lattice data
+	for j in range(nboots): #Temporarily fill with the true phys data, before we have run and fit the lattice data
 		b_MK[0,0,0,0,j] = 0.13957018 + (randrange(0,99))/1000.0
 		b_FK[0,0,0,0,j] = 0.13 + (randrange(0,100))/1000.0
 		b_mpsq_fpsq[0,0,0,0,j] = pow(b_MK[0,0,0,0,j]/(4*pi*b_FK[0,0,0,0,j]),2)
+	b_MK[0,0,0,0,-1] = 0.13957018
+	b_FK[0,0,0,0,-1] = 0.13 
+	b_mpsq_fpsq[0,0,0,0,-1] = pow(b_MK[0,0,0,0,-1]/(4*pi*b_FK[0,0,0,0,-1]),2)
 	for ic in [1,2, 3, 4, 5]:
 		filename = 'Julia_data/bag/' + lat  + '/bag-' + meson + '/dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) + '-channel'+str(ic)+'.dat'
 		data,error=rf.read_bootstraps(filename)
-		B[ic-1,0,0,0] = data
+		for iboot in range(nboots+1):
+			B[ic-1,0,0,0,iboot] = data[iboot]/Ninv[ic-1]
+	print "Done"+"\n"
 	return B, b_MK, b_FK, b_mpsq_fpsq
 
 
@@ -171,14 +180,13 @@ for iBeta in range(2): #loop through 24, and 32 (Non-Physical)
 	##########################################
     	#Calculate the Bag paramater and Ratio R 
     	print "Calculate bag and R ..."
-    	B = calcBag(matel_3p_2p)
+    	B = matel_3p_2p
     	R = calc_R(b_FK,b_MK,matel_3p_rat)
     	##########################################
 
 
     	##########################################################################################################################
     	#Renormlise B and R
-    	print name_scheme[scheme],latticedim[iBeta],name_kin[kin]
     	Zfilename = "data/Z" + name_scheme[scheme] + "_boot_mu_match_" + volname[iBeta] + "_" + name_kin[kin] + "_block.out" 	
 	Rren_phys,Bren_phys = Renormalise(ibas,kin,iBeta,Zfilename,R=R,B=B)
     	##########################################################################################################################
@@ -193,8 +201,8 @@ for iBeta in range(2): #loop through 24, and 32 (Non-Physical)
 
 	#print Bren_phys[:,:,0:2,:,:]
 
-	IR = lf.R_Interp(Rren_phys[:,:,0:2,:,:], ms[0:2], ms_phys)
-    	IB = lf.R_Interp(Bren_phys[:,:,0:2,:,:], ms[0:2], ms_phys)
+	IR = lf.R_Interp(Rren_phys[:,:,:,:,:], ms[:], ms_phys)
+    	IB = lf.R_Interp(B[:,:,:,:,:], ms[:], ms_phys)
     	###########################################################
  
 
@@ -212,28 +220,27 @@ for iBeta in range(2): #loop through 24, and 32 (Non-Physical)
 
 print "Finished reading + interpolating Nicolas' data"
 
-for iBeta in [2,3]: #loop through the first 2 phsy data lattices (reuse Z frm 24 & 32)
-	print "iBeta is ", iBeta   	
+for iBeta in [2,3]: #loop through the first 2 phsy data lattices (reuse Z frm 24 & 32)  	
     	iParams = setup.Params(iBeta)
     	params.append(iParams)   
 	ainv.append(deepcopy(iParams.ainv))	
-	B, b_MK, b_FK, b_mpsq_fpsq = return_myBag(iBeta,iParams,nboot)
+	B_new, b_MK, b_FK, b_mpsq_fpsq = return_myBag(iBeta,iParams,nboot)
 	#read all the new physical files here		
 	#still need the R data + pion mass + decays
     	
 	##########################################################################################################################
     	#Renormlise B and R
-    	print name_scheme[scheme],latticedim[iBeta],name_kin[kin]
     	Zfilename = "data/Z" + name_scheme[scheme] + "_boot_mu_match_" + volname[iBeta-2] + "_" + name_kin[kin] + "_block.out" 
-	Bren_phys = Renormalise(ibas,kin,iBeta,Zfilename,B=B)
+	Rdummy, Bren_phys = Renormalise(ibas,kin,iBeta,Zfilename,B=B_new)
     	##########################################################################################################################
 
 	#no need to interpolate here, already at the physical strange
 
-	Blst.append(B)
+	Blst.append(Bren_phys)
 	#Rlst.append(R)
 	#IRlst.append(R)
-	IBlst.append(B)
+	IBlst.append(B_new)
+	#IBlst.append(Bren_phys)
 	mlst.append(b_MK)
 	flst.append(b_FK)
 	m2_f2lst.append(b_mpsq_fpsq)
@@ -251,10 +258,21 @@ dimIB = np.shape(IB)
 #Rphys=[]
 Bphys=[]
 
+a_store = np.zeros([2])
+a_store[0] = 1/(ainv[2]*ainv[2])
+a_store[1] = 1/(ainv[3]*ainv[3])
 
-print "ainv", ainv
 
 for ic in range(dimIB[0]): #loop channels
+	IB3_store = np.zeros([2,nboot+1])
+	m3_store = np.zeros([2,nboot+1])
+
+	for iboot in range(nboot+1):
+		IB3_store[0,iboot] = (IBlst[2])[ic,0,0,0,iboot]
+		IB3_store[1,iboot] = (IBlst[3])[ic,0,0,0,iboot]
+		m3_store[0,iboot] = (m2_f2lst[2])[0,0,0,0,iboot]
+		m3_store[1,iboot] = (m2_f2lst[3])[0,0,0,0,iboot]
+
 	for iv2 in range(dimIB[2]): #loop valence 2 (=1 here, unitary=sea)
         	IB1_store = np.zeros([dimIB[1]-1,dimIB[3]]) 
      	   	IB2_store = np.zeros([dimIB[1],dimIB[3]])
@@ -275,7 +293,7 @@ for ic in range(dimIB[0]): #loop channels
         	nameR="R" + str(ic) + "_"+ name_basis[ibas]+"_"+name_scheme[scheme]+"_"+name_kin[kin]
         	nameB="B"+str(ic)+"_"+name_basis[ibas]+"_"+name_scheme[scheme]+"_"+name_kin[kin]
        		#Rpcent, covcent, Rbp, Rbcov, Rbchisq, Ryp = nlf.bootglobalfit(IR1_store,IR2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,mpsq_fpsq_phys,r"$m^2_{\pi}/(4\pi f_{\pi})^2$",r"$R_{"+str(ic+1)+"}$",nameR)
-       		Bpcent, Bcovcent, Bbp, Bbcov, Bbchisq, Byp = nlf.bootglobalfit(IB1_store,IB2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,mpsq_fpsq_phys,r"$m^2_{\pi}/(4\pi f_{\pi})^2$",r"$B_{"+str(ic+1)+"}$",nameB)
+       		Bpcent, Bcovcent, Bbp, Bbcov, Bbchisq, Byp = nlf.bootglobalfit(IB1_store,IB2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,mpsq_fpsq_phys,r"$m^2_{\pi}/(4\pi f_{\pi})^2$",r"$B_{"+str(ic+1)+"}$",nameB,IB3_store,a_store,m3_store)
        		#Rphys.append(Ryp)
        		Bphys.append(Byp)
 

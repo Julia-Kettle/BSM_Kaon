@@ -64,23 +64,23 @@ def bootglobalfit(y1,y2,a1,a2,m1,m2,nboot,p0,mp,xlabel,ylabel,name,y3=[],a3=[],m
     bp=[]
     bcov = []
     bchisq = []
-    if y3 and a3 and m3:
+    if type(y3)==np.ndarray and type(a3)==np.ndarray and type(m3)==np.ndarray:
         np.hstack((asq,a3))
         err3 = np.std(y3[:][0:nboot],axis=1)
     for j in range(nboot+1):
         y = []
-        m = []
+        msq = []
         for i in range(len(y1)):
             y.append(y1[i,j])
-            m.append(m1[i,j])
+            msq.append(m1[i,j])
         for i in range(len(y2)):
             y.append(y2[i,j])
-            m.append(m2[i,j])
-        if y3 and a3 and m3:
-            np.hstack((y,y3[:][j]))
-            np.hstack((msq,m3[:][j]))
+            msq.append(m2[i,j])
+        if type(y3)==np.ndarray and type(a3)==np.ndarray and type(m3)==np.ndarray:
+            np.hstack((y,y3[:,j]))
+            np.hstack((msq,m3[:,j]))
         y = np.array(y)
-        msq = np.array(m)
+        msq = np.array(msq)
 
         p, cov, chisq = globalfit(y,yerr,msq,asq,p0)
         bp.append(p)
@@ -92,8 +92,8 @@ def bootglobalfit(y1,y2,a1,a2,m1,m2,nboot,p0,mp,xlabel,ylabel,name,y3=[],a3=[],m
     perr = np.std(bp[0:nboot],axis=0)
     pcent = bp[-1]
     covcent = bcov[-1]
-    if y3 and a3 and m3:
-        yp = plot_Global(pcent,globalfunction,y1,y2,err1,err2,m1,m2,mp,a1,a2,xlabel,ylabel,name,y3,m3,a3)
+    if type(y3)==np.ndarray and type(a3)==np.ndarray and type(m3)==np.ndarray:
+        yp = plot_Global(pcent,globalfunction,y1,y2,err1,err2,m1,m2,mp,a1,a2,xlabel,ylabel,name,y3,err3,m3,a3)
     else:
         yp = plot_Global(pcent,globalfunction,y1,y2,err1,err2,m1,m2,mp,a1,a2,xlabel,ylabel,name)
     

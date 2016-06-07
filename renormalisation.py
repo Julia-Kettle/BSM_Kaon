@@ -41,7 +41,6 @@ def ZA_ZP(ikin,ibeta):
 def MultRZ(R,ZschemeB,T):
     #Scale the ratios R by Z factor
 	dimR = np.shape(R)
-	print dimR
     	ren_R = np.zeros(dimR)
     	ren_phys_R = np.zeros(dimR)
     	for iml in range(dimR[1]):
@@ -61,36 +60,38 @@ def MultRZ(R,ZschemeB,T):
 ###################################################################################################################
 def MultBZ(B,ZschemeB,ZA,ZP,T,N):
     #Scale the bag B by the Z factors
-    dimB = np.shape(B)
-    ren_B = np.zeros(dimB)
-    ren_phys_B = np.zeros(dimB)
-    B_phys = np.zeros(dimB)
-    for iml in range(dimB[1]):
-        for ims in range(dimB[2]):
-            for imq in range(dimB[3]):
-                for iboot in range(dimB[4]):
-                    for ich in range(5):
-                        for jch in range(5):
-				#if iboot == 500:
-				#print ich, jch, ZschemeB[ich,jch], B[jch,iml,ims,imq,iboot], ren_B[ich,iml,ims,imq,iboot]
-                            	ren_B[ich,iml,ims,imq,iboot] += ZschemeB[ich,jch]*B[jch,iml,ims,imq,iboot]*ZA*ZA
-                    for ich in range(5):
-                        for jch in range(5):
-                            ren_phys_B[ich,iml,ims,imq,iboot] += T[ich,jch]*ren_B[jch,iml,ims,imq,iboot]*ZA*ZA
-                    for ich in range(5):
-                        B_phys[ich,iml,ims,imq,iboot] = ren_phys_B[ich,iml,ims,imq,iboot]/(ZP*ZP*N[ich])
-    return ren_B, ren_phys_B, B_phys
+    	dimB = np.shape(B)
+    	ren_B = np.zeros(dimB)
+    	ren_phys_B = np.zeros(dimB)
+    	B_phys = np.zeros(dimB)
+    	for iml in range(dimB[1]):
+        	for ims in range(dimB[2]):
+            		for imq in range(dimB[3]):
+                		for iboot in range(dimB[4]):
+                    			for ich in range(5):
+                        			for jch in range(5):
+                            				ren_B[ich,iml,ims,imq,iboot] += ZschemeB[ich,jch]*B[jch,iml,ims,imq,iboot]*(ZA*ZA)
+                    			for ich in range(5):
+                        			for jch in range(5):
+                            				ren_phys_B[ich,iml,ims,imq,iboot] += T[ich,jch]*ren_B[jch,iml,ims,imq,iboot]
+                    			B_phys[0,iml,ims,imq,iboot] = ren_phys_B[0,iml,ims,imq,iboot]/(ZA*ZA*N[0])
+					for ich in range(1,5):
+                        			B_phys[ich,iml,ims,imq,iboot] = ren_phys_B[ich,iml,ims,imq,iboot]/(ZP*ZP*N[ich])
+    	return ren_B, ren_phys_B, B_phys
 ####################################################################################################################
 
 
 ##################################################################################################
 def Renormalise(ibas,ikin,ibeta,Zfilename,R=[],B=[]):
-    	#Pass the filename with the Zfactors, basis, kinematics and vol to renormalise the ratio and the bag
-    	N_ren = [8/3,4/3,-2,5/3,1] #This is the factor in the bag parameter
-    	#N_ren = [1, 1, 1, 1, 1]
+    	print " B ", type(B)
+	print "R ", type(R)
+	#Pass the filename with the Zfactors, basis, kinematics and vol to renormalise the ratio and the bag
+    	N_ren = [8.0/3,4.0/3,-2.0,5.0/3,1.0] #This is the factor in the bag parameter
+	#N_ren = [1.0, 1.0, 1.0, 1.0, 1.0]
 	ZA, ZP = ZA_ZP(ikin,ibeta)
     	#Zfilename = "data/Z" + scheme_name + "_boot_mu_match_" + volname + name_kin +"_block.out"
-    	ZschemeB, ZschemeC, ZschemeE = Read_Z(Zfilename)
+    	print Zfilename
+	ZschemeB, ZschemeC, ZschemeE = Read_Z(Zfilename)
     	if ibas==1:#susy
        		T=np.array([[1,0,0,0,0],[0,0,0,1,0],[0,0,0,-0.5,0.5],[0,0,1,0,0],[0,-0.5,0,0,0]])
     	elif ibas==0:#renorm
@@ -98,18 +99,18 @@ def Renormalise(ibas,ikin,ibeta,Zfilename,R=[],B=[]):
     	N=[0,0,0,0,0]
     	for i in range(len(N_ren)):
         	for j in range(len(N_ren)):
-            		N[i] +=  N_ren[j]*T[j][i] ##Might need to remove N_ren?? Already used on the bag??
-    	#5by5byNboot+1 times
+            		N[i] +=  N_ren[j]*T[i][j] ##Might need to remove N_ren?? Already used on the bag??
+	#5by5byNboot+1 times
 	if type(R) == np.ndarray and type(B) == np.ndarray:	
-    		print "Both passed"
 		ren_B, ren_phys_B, B_phys = MultBZ(B,ZschemeC,ZA,ZP,T,N)
     		ren_R, ren_phys_R = MultRZ(R,ZschemeC,T)
-		return ren_phys_R, B_phys
-
 	elif type(R) == np.ndarray:
     		ren_R, ren_phys_R = MultRZ(R,ZschemeC,T)
-		return ren_phys_R
+		B_phys=[]
 	elif type(B) == np.ndarray:
+		print "Renormalising B"
     		ren_B, ren_phys_B, B_phys = MultBZ(B,ZschemeC,ZA,ZP,T,N)
-    		return B_phys
+		ren_phys_R = []
+
+	return ren_phys_R, B_phys
 ###################################################################################################    
