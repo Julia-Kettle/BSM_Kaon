@@ -9,7 +9,7 @@ def plot_Global(p,function,y1,y2,yerr1, yerr2,m1,m2,mp,a1,a2,xlabel,ylabel,name,
     plot physical mass + continuum
     '''
 
-    x = range(0,10000)
+    x = range(0,50000)
     f1=[]
     f2=[]
     for i in range(len(x)):
@@ -21,13 +21,13 @@ def plot_Global(p,function,y1,y2,yerr1, yerr2,m1,m2,mp,a1,a2,xlabel,ylabel,name,
     p2 = function(p,mp,a2)
     plt.figure()
     #print len(m1[0:-1]), len(y1), len(yerr1)
-    plt.errorbar(m1[:,-1],y1[:,-1],yerr=yerr1)
-    plt.errorbar(m2[:,-1],y2[:,-1],yerr=yerr2)
+    plt.errorbar(m1[:,-1],y1[:,-1],yerr=yerr1,ecolor='r',fmt=' ')
+    plt.errorbar(m2[:,-1],y2[:,-1],yerr=yerr2,ecolor='b',fmt=' ')
     plt.plot(x,f1,'r--')
     plt.plot(x,f2,'b--')
     plt.plot(mp,yp,'kx',)
-    #plt.plot(mp,p1,'kx',)
-    #plt.plot(mp,p2,'kx',)
+    plt.plot(mp,p1,'rx',)
+    plt.plot(mp,p2,'bx',)
 
     if type(y3)==np.ndarray and type(m3)==np.ndarray and type(yerr3)==np.ndarray:
         for i in range(len(y3)):
@@ -36,6 +36,6 @@ def plot_Global(p,function,y1,y2,yerr1, yerr2,m1,m2,mp,a1,a2,xlabel,ylabel,name,
     plt.xlabel(xlabel,fontsize=16)
     plt.ylabel(ylabel,fontsize=20)
     #plt.show()
-    plt.savefig(name,format='pdf')
-
-    return yp
+    plt.savefig(name+'.pdf',format='pdf')
+    plt.close()
+    

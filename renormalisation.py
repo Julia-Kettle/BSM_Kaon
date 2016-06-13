@@ -39,7 +39,7 @@ def ZA_ZP(ikin,ibeta):
 
 #########################################################################################################################################################
 def MultRZ(R,ZschemeB,T):
-    #Scale the ratios R by Z factor
+    	#Scale the ratios R by Z factor
 	dimR = np.shape(R)
     	ren_R = np.zeros(dimR)
     	ren_phys_R = np.zeros(dimR)
@@ -50,10 +50,10 @@ def MultRZ(R,ZschemeB,T):
                     			for ich in range(5):
                         			for jch in range(5):
                             				ren_R[ich,iml,ims,imq,iboot] += ZschemeB[ich,jch]*R[jch,iml,ims,imq,iboot]/ZschemeB[0][0] 
-                    				for ich in range(5):
-                        				for jch in range(5):
-                            					ren_phys_R[ich,iml,ims,imq,iboot] += T[ich,jch]*ren_R[jch,iml,ims,imq,iboot] #convert to correct basis, T=I in lattice basis
-    	return ren_R, ren_phys_R
+                    			for ich in range(5):
+                        			for jch in range(5):
+                            				ren_phys_R[ich,iml,ims,imq,iboot] += T[ich,jch]*ren_R[jch,iml,ims,imq,iboot] #convert to correct basis, T=I in lattice basis
+	return ren_R, ren_phys_R
 ##########################################################################################################################################################
 
 
@@ -83,8 +83,6 @@ def MultBZ(B,ZschemeB,ZA,ZP,T,N):
 
 ##################################################################################################
 def Renormalise(ibas,ikin,ibeta,Zfilename,R=[],B=[]):
-    	print " B ", type(B)
-	print "R ", type(R)
 	#Pass the filename with the Zfactors, basis, kinematics and vol to renormalise the ratio and the bag
     	N_ren = [8.0/3,4.0/3,-2.0,5.0/3,1.0] #This is the factor in the bag parameter
 	#N_ren = [1.0, 1.0, 1.0, 1.0, 1.0]
@@ -108,7 +106,6 @@ def Renormalise(ibas,ikin,ibeta,Zfilename,R=[],B=[]):
     		ren_R, ren_phys_R = MultRZ(R,ZschemeC,T)
 		B_phys=[]
 	elif type(B) == np.ndarray:
-		print "Renormalising B"
     		ren_B, ren_phys_B, B_phys = MultBZ(B,ZschemeC,ZA,ZP,T,N)
 		ren_phys_R = []
 

@@ -27,30 +27,30 @@ def calcBag(matel_3p_2p):
     	'''
 
 def calc_R(Fk,Mk,Rat):
-    """
-    Calculates the ratio of each channel 3pt over sm 3pt.
-    timesed by a factor (Fk/Mk)^2phys*(Mpi/Fpi)^2
-    """
-    dim = []
-    dim1 = np.shape(Rat)
-    dim2 = np.shape(Fk)
-    for i in range(len(dim1)):
-        dim.append(min(dim1[i],dim2[i]))
-    dim[0] = 5
-    R = np.zeros(dim)
-    Mkphys = 0.5*(493.677+497.614)*pow(10,-3)
-    Fkphys = 156.2*pow(10,-3)
-    #Mkphys = 139.57018
-    #Fkphys=130
-    for i in range(dim[1]):
-        for j in range(dim[2]):
-            for k in range(dim[3]):
-                for m in range(dim[4]):
-                    for l in range(1,dim[0]):
-                        R[0,i,j,k,m] = pow((Fkphys/Mkphys),2)*pow((Mk[0,i,j,k,m]/Fk[0,i,j,k,m]),2)
-                        R[l,i,j,k,m] = pow((Fkphys/Mkphys),2)*pow((Mk[0,i,j,k,m]/Fk[0,i,j,k,m]),2)*Rat[l-1,i,j,k,m]
+   	"""
+    	Calculates the ratio of each channel 3pt over sm 3pt.
+    	timesed by a factor (Fk/Mk)^2phys*(Mpi/Fpi)^2
+    	"""
+    	dim = []
+    	dim1 = np.shape(Rat)
+    	dim2 = np.shape(Fk)
+    	for i in range(len(dim1)):
+        	dim.append(min(dim1[i],dim2[i]))
+    	dim[0] = 5
+    	R = np.zeros(dim)
+    	Mkphys = 0.5*(493.677+497.614)*pow(10,-3)
+    	Fkphys = 156.2*pow(10,-3)
+	#Mkphys = 139.57018
+    	#Fkphys=130
+    	for i in range(dim[1]):
+        	for j in range(dim[2]):
+            		for k in range(dim[3]):
+                		for m in range(dim[4]):
+                    			for l in range(1,dim[0]):
+                        			R[0,i,j,k,m] = pow((Fkphys/Mkphys),2)*pow((Mk[0,i,j,k,m]/Fk[0,i,j,k,m]),2)
+                        			R[l,i,j,k,m] = pow((Fkphys/Mkphys),2)*pow((Mk[0,i,j,k,m]/Fk[0,i,j,k,m]),2)*Rat[l-1,i,j,k,m]
                              
-    return R
+    	return R
                         
 def renR(R,Z):
     dimZ = np.shape(Z)
