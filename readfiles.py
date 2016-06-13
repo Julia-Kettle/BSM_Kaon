@@ -50,8 +50,6 @@ def read_bootstraps(filename):
     return data, error
 
 def read_results(filename,nc,n_mseal,n_mval1,n_mval2,nboot):
-    print "Reading  " + filename
-    print "Reading  " + filename
     data=read_datacol_file(filename)
     cnt = 0
     array = np.zeros([nc,n_mseal,n_mval1,n_mval2,nboot])
@@ -77,8 +75,6 @@ def read_results_Jamie(filename):
     Values gained are bootstraps + central of either fk, mk or mk0fk(crossterms)
     '''
     fo = open(filename,"rb")
-    print "Opening " + filename
-    print "Opening " + filename
     sect = fo.read(4) #read 4bytes of data (1st n)
     count=0;
     dummy = []

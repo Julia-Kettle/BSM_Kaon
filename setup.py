@@ -50,9 +50,9 @@ class Params:
             		self.n_chan = 5;
 
 
-        	elif beta == 1:
-			self.latticename = '48'
-			self.ainv = 2.3883
+        	elif beta == 2:
+			self.latticename = '48cubed'
+			self.ainv = 1.730
             		self.m_sea_s = 0.0362
             		self.m_sea_s_phys = 0.02477
             		self.m_sea_s_pq = 0.025
@@ -70,13 +70,14 @@ class Params:
             		self.cps_conv = 3.2 ##???
             		self.n_chan = 5;
         	
+        	
 		elif beta == 3:
-			self.latticename = '48fine'
-			self.ainv = 2.3883
-            		self.m_sea_s = 0.02661
+			self.latticename = '64cubed'
+			self.ainv = 2.359
+          		self.m_sea_s = 0.02661
             		self.m_sea_s_phys = 0.02661
             		self.m_sea_s_pq = 0.02661
-            		self.m_sea_l = [0.002661]
+            		self.m_sea_l = [0.000678]
             		self.m_val_s = [0.02661]
             		self.n_l_m = 10
             		self.n_uni_pi = 3
@@ -89,15 +90,16 @@ class Params:
             		self.twall = 1
             		self.cps_conv = 3.2 ##???
             		self.n_chan = 5;
-        	
+
+
 		elif beta == 4:
-			self.latticename = '64'
+			self.latticename = '48cubedfine'
 			self.ainv = 2.3883
-            		self.m_sea_s = 0.02114
-            		self.m_sea_s_phys = 0.02114
-            		self.m_sea_s_pq = 0.02114
-            		self.m_sea_l = [0.000678]
-            		self.m_val_s = [0.02114]
+            		self.m_sea_s = 0.02144
+            		self.m_sea_s_phys = 0.02144
+            		self.m_sea_s_pq = 0.02144
+            		self.m_sea_l = [0.002144]
+            		self.m_val_s = [0.02144]
             		self.n_l_m = 10
             		self.n_uni_pi = 3
             		self.kaon_f = 11
@@ -109,8 +111,6 @@ class Params:
             		self.twall = 1
             		self.cps_conv = 3.2 ##???
             		self.n_chan = 5;
-
-
 
 
 		self.name_chan= ['bPS_bPS','bPS_bA0','bPS_pPS','bPS_pA0','bA0_pA0']
