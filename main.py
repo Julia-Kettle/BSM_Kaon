@@ -135,10 +135,7 @@ def return_myBag(iBeta,iParams,nboots):
 	msea = deepcopy(iParams.m_sea_l)
 	kaon = 's' + str(ms[0]) + '-l'+ str(msea[0])
 	lat = iParams.latticename
-	if iBeta == 2:
-		Ninv = [3.0/8,3.0/4,-0.5,3.0/5,1.0] #removes scaling to be consistent with Nicolas, re-added in later.
-	if iBeta == 3:
-		Ninv = [3.0/8,3.0/4,3.0/5,-0.5,1.0]
+	Ninv = [3.0/8,3.0/4,-0.5,3.0/5,1.0] #removes scaling to be consistent with Nicolas, re-added in later.
 	B = np.zeros([5,1,1,1,nboots+1])
 	R = np.zeros([5,1,1,1,nboots+1])
 	#loop throught the channels
