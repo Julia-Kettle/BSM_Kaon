@@ -1,10 +1,10 @@
 #!/bin/bash
 
-for lat in 48cubed 48cubedfine 64cubed
+for lat in 64cubed
 do
 
 
-for f in /home/julia/Fits/${lat}/mass/*/*.dat
+for f in ../../Fits/${lat}/mass/mass*/*_boots.dat
 do
 #echo $f
 name=`basename $f`
@@ -26,7 +26,7 @@ done
 
 for c in 0 2 4 6 8
 do
-for f in /home/julia/Fits/${lat}/bag/channel${c}/*/*.dat
+for f in ../../Fits/${lat}/bag/channel${c}/bag*/*_boots.dat
 do
 
 name=`basename $f`
