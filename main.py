@@ -69,6 +69,7 @@ def return_Jamie_data(iBeta,iParams,nboot):
                     			b_FK[0,i,j,k,l] = dataFK[l]
                     			b_MK[0,i,j,k,l] = dataMK[l]
                     			b_mpsq_fpsq[0,i,j,k,l]= pow((b_MK[0,i,j,k,l]/(4*pi*b_FK[0,i,j,k,l])),2)
+				#print b_FK[0,i,j,k,-1]
 	print "Done"+"\n"
 	return b_FK, b_MK, b_mpsq_fpsq
     ######################################################################################################################################################
@@ -109,18 +110,22 @@ def return_myMeson(iBetam,iParams,nboots):
 	b_FK =  np.zeros([1,1,2,1,nboots+1])
 	b_mpsq_fpsq = np.zeros([1,1,2,1,nboots+1])
 	#set up filenames & read data
-	filename=[]
-	filename.append('Julia_data/mass/' + lat + '/mass-' + pion + '/mass-' + pion +'.dat')
-	filename.append('Julia_data/mass/' + lat + '/mass-' + kaon + '/mass-' + kaon +'.dat')
+	filenameM=[]
+	filenameF=[]
+	filenameM.append('Julia_data/mass/' + lat + '/mass-' + pion + '/mass-' + pion +'.dat')
+	filenameM.append('Julia_data/mass/' + lat + '/mass-' + kaon + '/mass-' + kaon +'.dat')
+	filenameF.append('Julia_data/mass/' + lat + '/decay-' + pion + '/decay-' + pion +'.dat')
+	filenameF.append('Julia_data/mass/' + lat + '/decay-' + kaon + '/decay-' + kaon +'.dat')
 	for ival in range(len(mval)):
-		data , error = rf.read_bootstraps(filename[ival])
+		dataM , error = rf.read_bootstraps(filenameM[ival])
+		dataF , error = rf.read_bootstraps(filenameF[ival])
 		#assign data to arrays
 		for iboot in range(nboots): #Temporarily fill with the true phys data, before we have run and fit the lattice data
-			b_MK[0,0,ival,0,iboot] = data[iboot]
-			b_FK[0,0,ival,0,iboot] = 0.15551 + (randrange(0,100))/10000.0
+			b_MK[0,0,ival,0,iboot] = dataM[iboot]
+			b_FK[0,0,ival,0,iboot] = dataF[iboot]
 			b_mpsq_fpsq[0,0,ival,0,iboot] = pow(b_MK[0,0,ival,0,iboot]/(4*pi*b_FK[0,0,ival,0,iboot]),2)
-		b_MK[0,0,ival,0,-1] = data[-1]
-		b_FK[0,0,ival,0,-1] = 0.13
+		b_MK[0,0,ival,0,-1] = dataM[-1]
+		b_FK[0,0,ival,0,-1] = dataF[-1]
 		print b_MK[0,0,0,0,-1], b_FK[0,0,0,0,-1] 
 		b_mpsq_fpsq[0,0,ival,0,-1] = pow(b_MK[0,0,ival,0,-1]/(4*pi*b_FK[0,0,ival,0,-1]),2)
 	print "Done" + "\n"
@@ -154,7 +159,7 @@ def return_myBag(iBeta,iParams,nboots):
 				R[ic-1,0,0,0,iboot] = 1.0
 			else:
 				B[ic-1,0,0,0,iboot] = data[iboot]/Ninv[ic-1]
-				R[ic-1,0,0,0,iboot] = data[iboot]/Ninv[ic-1]
+				R[ic-1,0,0,0,iboot] = B[ic-1,0,0,0,iboot]/B[0,0,0,0,iboot]
 
 	print "Done"+"\n"
 	return B, R
@@ -273,9 +278,10 @@ def main(scheme,kin,bas):
 		ainv.append(deepcopy(iParams.ainv))	
 		B_new, R_new = return_myBag(iBeta,iParams,nboot)
 		b_MK, b_FK, b_mpsq_fpsq = return_myMeson(iBeta,iParams,nboot)
+	
 		#read all the new physical files here		
 		#still need the R data + pion mass + decays
-		
+		R_new=calc_R(b_FK,b_MK,R_new)	
 		##########################################################################################################################
 		#Renormlise B and R
 		Zfilename = "data/Z" + name_scheme[scheme] + "_boot_mu_match_" + volname[iBeta-2] + "_" + name_kin[kin] + "_block.out" 
@@ -358,7 +364,7 @@ def main(scheme,kin,bas):
 
 if __name__ == "__main__":
 	
-	for ischeme in range(2):
-		for ikin in range(5):
-			for ibas in range(2):
+	for ischeme in range(1):
+		for ikin in range(1):
+			for ibas in range(1):
 				main(ischeme,ikin,ibas)

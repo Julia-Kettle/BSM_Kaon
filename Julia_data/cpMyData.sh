@@ -1,10 +1,10 @@
 #!/bin/bash
 
-for lat in 64cubed
+for lat in 48cubed 64cubed
 do
 
 
-for f in ../../Fits/${lat}/mass/mass*/*_boots.dat
+for f in ../../Fits/${lat}/mass/mass*/mass*_boots.dat
 do
 #echo $f
 name=`basename $f`
@@ -23,6 +23,24 @@ cp $f $totalpath$newname.dat
 
 done
 
+for f in ../../Fits/${lat}/mass/mass*/decay*_boots.dat
+do
+#echo $f
+name=`basename $f`
+dir=`dirname $f`
+
+#echo $name
+#echo $dir
+
+newname=`echo $name | sed 's@_boots.dat@@g'`
+
+totalpath=./mass/$lat/$newname/
+
+mkdir -p $totalpath
+
+cp $f $totalpath$newname.dat
+
+done
 
 for c in 0 2 4 6 8
 do
