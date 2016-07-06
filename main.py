@@ -112,10 +112,10 @@ def return_myMeson(iBetam,iParams,nboots):
 	#set up filenames & read data
 	filenameM=[]
 	filenameF=[]
-	filenameM.append('Julia_data/mass/' + lat + '/mass-' + pion + '/mass-' + pion +'.dat')
-	filenameM.append('Julia_data/mass/' + lat + '/mass-' + kaon + '/mass-' + kaon +'.dat')
-	filenameF.append('Julia_data/mass/' + lat + '/decay-' + pion + '/decay-' + pion +'.dat')
-	filenameF.append('Julia_data/mass/' + lat + '/decay-' + kaon + '/decay-' + kaon +'.dat')
+	filenameM.append('../Fits/' + lat + '/mass/mass-' + pion + '/mass-' + pion + '_boots.dat')
+	filenameM.append('../Fits/' + lat + '/mass/mass-' + kaon + '/mass-' + kaon +'_boots.dat')
+	filenameF.append('../Fits/' + lat + '/mass/mass-' + pion + '/decay-' + pion +'_boots.dat')
+	filenameF.append('../Fits/' + lat + '/mass/mass-' + kaon + '/decay-' + kaon +'_boots.dat')
 	for ival in range(len(mval)):
 		dataM , error = rf.read_bootstraps(filenameM[ival])
 		dataF , error = rf.read_bootstraps(filenameF[ival])
@@ -144,22 +144,22 @@ def return_myBag(iBeta,iParams,nboots):
 	B = np.zeros([5,1,1,1,nboots+1])
 	R = np.zeros([5,1,1,1,nboots+1])
 	#loop throught the channels
-	for ic in [1,2, 3, 4, 5]:
+	for ic in [0,1,2, 3, 4]:
 		# 3 & 4 need to switched - convention choice
-		if ic == 3:			
-			filename = 'Julia_data/bag/' + lat  + '/bag-' + kaon + '/dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) + '-channel'+str(ic+1)+'.dat'
-		elif ic ==4:
-			filename = 'Julia_data/bag/' + lat  + '/bag-' + kaon + '/dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) + '-channel'+str(ic-1)+'.dat'
+		if ic == 2:			
+			filename = '../Fits/' + lat  + '/bag/channel' +str(2*ic+2) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
+		elif ic ==3:
+			filename = '../Fits/' + lat  + '/bag/channel' +str(2*ic-2) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
 		else:
-			filename = 'Julia_data/bag/' + lat  + '/bag-' + kaon + '/dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) + '-channel'+str(ic)+'.dat'
+			filename = '../Fits/' + lat  + '/bag/channel' +str(2*ic) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
 		data,error=rf.read_bootstraps(filename)
 		for iboot in range(nboots+1):
-			if ic == 1:
-				B[ic-1,0,0,0,iboot] = data[iboot]/Ninv[ic-1]
-				R[ic-1,0,0,0,iboot] = 1.0
+			if ic == 0:
+				B[ic,0,0,0,iboot] = data[iboot]/Ninv[ic]
+				R[ic,0,0,0,iboot] = 1.0
 			else:
-				B[ic-1,0,0,0,iboot] = data[iboot]/Ninv[ic-1]
-				R[ic-1,0,0,0,iboot] = B[ic-1,0,0,0,iboot]/B[0,0,0,0,iboot]
+				B[ic,0,0,0,iboot] = data[iboot]/Ninv[ic]
+				R[ic,0,0,0,iboot] = B[ic,0,0,0,iboot]/B[0,0,0,0,iboot]
 
 	print "Done"+"\n"
 	return B, R
