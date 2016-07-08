@@ -54,7 +54,7 @@ class Params:
 			self.latticename = '48cubed'
 			self.ainv = 1.730
             		self.m_sea_s = 0.0362
-            		self.m_sea_s_phys = 0.02477
+            		self.m_sea_s_phys = 0.03224
             		self.m_sea_s_pq = 0.025
             		self.m_sea_l = [0.00078]
             		self.m_val_s = [0.0362]
@@ -75,7 +75,7 @@ class Params:
 			self.latticename = '64cubed'
 			self.ainv = 2.359
           		self.m_sea_s = 0.02661
-            		self.m_sea_s_phys = 0.02661
+            		self.m_sea_s_phys = 0.02477
             		self.m_sea_s_pq = 0.02661
             		self.m_sea_l = [0.000678]
             		self.m_val_s = [0.02661]

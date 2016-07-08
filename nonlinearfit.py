@@ -69,27 +69,27 @@ def bootglobalfit(y1,y2,a1,a2,m1,m2,nboot,p0,mp,xlabel,ylabel,name,y3=[],a3=[],m
 	np.hstack((asq,a3))
 	err3 = np.std(y3[:][0:nboot],axis=1)
     for j in range(nboot+1):
-	y = []
-	msq = []
-	for i in range(len(y1)):
-	    y.append(y1[i,j])
-	    msq.append(m1[i,j])
-	for i in range(len(y2)):
-	    y.append(y2[i,j])
-	    msq.append(m2[i,j])
-	if type(y3)==np.ndarray and type(a3)==np.ndarray and type(m3)==np.ndarray:
-	    np.hstack((y,y3[:,j]))
-	    np.hstack((msq,m3[:,j]))
-	y = np.array(y)
-	msq = np.array(msq)
+        y = []
+        msq = []
+        for i in range(len(y1)):
+            y.append(y1[i,j])
+            msq.append(m1[i,j])
+        for i in range(len(y2)):
+            y.append(y2[i,j])
+            msq.append(m2[i,j])
+        if type(y3)==np.ndarray and type(a3)==np.ndarray and type(m3)==np.ndarray:
+            np.hstack((y,y3[:,j]))
+            np.hstack((msq,m3[:,j]))
+        y = np.array(y)
+        msq = np.array(msq)
 
-	p, cov, chisq = globalfit(y,yerr,msq,asq,p0)
-	bp.append(p)
-	bcov.append(cov)
-	bchisq.append(chisq)
+        p, cov, chisq = globalfit(y,yerr,msq,asq,p0)
+        bp.append(p)
+        bcov.append(cov)
+        bchisq.append(chisq)
 
-	yp = globalfunction(p,0,mp)
-	byp.append(yp)
+        yp = globalfunction(p,0,mp)
+        byp.append(yp)
 
     perr = np.std(bp[0:nboot],axis=0)
     pcent = bp[-1]
