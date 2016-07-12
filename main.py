@@ -1,4 +1,5 @@
 '''
+        
 Perform the Global Fit. 
 Read Jamie's 2pt data for 24, 32
 Read Nicolas' 3pt data for 24, 32
@@ -91,6 +92,7 @@ def return_3pts(iBeta,iParams,nboots):
     matel_3p=rf.read_results(filename,5,len(msea),len(ms),1,nboots+1) #3pt
     filename = 'data/boot_matel_'+latticedim +'cubed_IW_3p_rat.txt'
     matel_3p_rat = rf.read_results(filename,4,len(msea),len(ms),1,nboots+1) #3pt1/3pti ~ R
+    print matel_3p_rat[:,:,:,:,-1]
     print "Done" + "\n"
     return matel_3p_2p, matel_3p, matel_3p_rat
     ###########################################################################################
@@ -140,7 +142,8 @@ def return_myBag(iBeta,iParams,nboots):
     lat = iParams.latticename
     Ninv = [3.0/8,3.0/4,-0.5,3.0/5,1.0] #removes scaling to be consistent with Nicolas, re-added in later.
     B = np.zeros([5,1,1,1,nboots+1])
-    R = np.zeros([5,1,1,1,nboots+1])
+    R = np.zeros([5,1,1,1,nboots+1])    
+    Rdenom = np.zeros([nboots+1])
     filename=[]
     #loop throught the channels
     for ic in [0,1,2, 3, 4]:
@@ -151,14 +154,22 @@ def return_myBag(iBeta,iParams,nboots):
             filename='../Fits/' + lat  + '/bag/channel' +str(2*ic-2) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
         else:
             filename='../Fits/' + lat  + '/bag/channel' +str(2*ic) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
-        data,error=rf.read_bootstraps(filename)
+        dataB,error=rf.read_bootstraps(filename)
+        if ic == 2:
+            filename='../Fits/' + lat  + '/3pt/channel' +str(2*ic+2) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
+        elif ic ==3:
+            filename='../Fits/' + lat  + '/3pt/channel' +str(2*ic-2) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
+        else:
+            filename='../Fits/' + lat  + '/3pt/channel' +str(2*ic) + '/bag-' + kaon + '-dt40/bag-s'+ str(ms[0]) + '-l' + str(msea[0]) +'-dt40_boots.dat'
+        dataR, error=rf.read_bootstraps(filename)
         for iboot in range(nboots+1):
             if ic == 0:
-                B[ic,0,0,0,iboot] = data[iboot]/Ninv[ic]
+                B[ic,0,0,0,iboot] = dataB[iboot]/Ninv[ic]
                 R[ic,0,0,0,iboot] = 1.0
+                Rdenom[iboot] = dataR[iboot]
             else:
-                B[ic,0,0,0,iboot] = data[iboot]/Ninv[ic]
-                R[ic,0,0,0,iboot] = B[ic,0,0,0,iboot]/B[0,0,0,0,iboot]
+                B[ic,0,0,0,iboot] = dataB[iboot]/Ninv[ic]
+                R[ic,0,0,0,iboot] = dataR[iboot]/Rdenom[iboot]
         print R[ic,0,0,0,-1], B[ic,0,0,0,-1]
     print "Done"+"\n"
     return B, R
@@ -220,7 +231,7 @@ def main(scheme,kin,bas):
 
         mpsq_fpsq_phys = pow(0.13957018/(4*pi*0.13),2)
         mp_phys = 0.13957018
-
+        fp_phys = 0.13
     for iBeta in range(2): #loop through 24, and 32 (Non-Physical)
 
         #class cotaining paramaters set up    
@@ -316,7 +327,6 @@ def main(scheme,kin,bas):
         IdB,dummy = lf.dR_Interp(dB,ml,ml_phys_pt[0])
         IBp=lf.phys_Interp(Bren_phys,IdB,ms_phys,ms_phys_pt[0])
 
-        print B_new
 
         Blst.append(Bren_phys)
         Rlst.append(R)
@@ -352,8 +362,8 @@ def main(scheme,kin,bas):
         for iboot in range(nboot+1):
             IB3_store[0,iboot] = (IBlst[2])[ic,0,0,iboot]
             IB3_store[1,iboot] = (IBlst[3])[ic,0,0,iboot]
-            m3_store[0,iboot] = pow((mlst[2])[0,0,0,0,iboot]*ainv[2],2)
-            m3_store[1,iboot] = pow((mlst[3])[0,0,0,0,iboot]*ainv[3],2)
+            m3_store[0,iboot] = (m2_f2lst[2])[0,0,0,0,iboot]
+            m3_store[1,iboot] = (m2_f2lst[3])[0,0,0,0,iboot]
             IR3_store[0,iboot] = (IRlst[2])[ic,0,0,iboot]
             IR3_store[1,iboot] = (IRlst[3])[ic,0,0,iboot]
         for iv2 in range(dimIB[2]): #loop valence 2 (=1 here, unitary=sea)
@@ -368,14 +378,15 @@ def main(scheme,kin,bas):
                     if isea <= 1:
                         IB1_store[isea,iboot] = (IBlst[0])[ic,isea,iv2,iboot]
                         IR1_store[isea,iboot] = (IRlst[0])[ic,isea,iv2,iboot]
-                        m1_store[isea,iboot]=pow((mlst[0])[0,isea,-1,iv2,iboot]*ainv[0],2)
+                        m1_store[isea,iboot]=(m2_f2lst[0])[0,isea,-1,iv2,iboot]
                     IB2_store[isea,iboot] = (IBlst[1])[ic,isea,iv2,iboot]
                     IR2_store[isea,iboot] = (IRlst[1])[ic,isea,iv2,iboot]
-                    m2_store[isea,iboot]=pow((mlst[1])[0,isea,-1,iv2,iboot]*ainv[1],2)
+                    #m2_store[isea,iboot]=pow((mlst[1])[0,isea,-1,iv2,iboot]*ainv[1],2)
+                    m2_store[isea,iboot]=(m2_f2lst[1])[0,isea,-1,iv2,iboot]
             nameR="./plots/R" + str(ic+1) + "_"+ name_basis[ibas]+"_"+name_scheme[scheme]+"_"+name_kin[kin]
             nameB="./plots/B"+str(ic+1)+"_"+name_basis[ibas]+"_"+name_scheme[scheme]+"_"+name_kin[kin]
-            Rpcent, covcent, Rbp, Rbcov, Rbchisq, Ryp = nlf.bootglobalfit(IR1_store,IR2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,pow(mp_phys,2),r"$m^2_{\pi}$",r"$R_{"+str(ic+1)+"}$",nameR,IR3_store,a_store,m3_store)
-            Bpcent, Bcovcent, Bbp, Bbcov, Bbchisq, Byp = nlf.bootglobalfit(IB1_store,IB2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,pow(mp_phys,2),r"$m^2_{\pi}$",r"$B_{"+str(ic+1)+"}$",nameB,IB3_store,a_store,m3_store)
+            Rpcent, covcent, Rbp, Rbcov, Rbchisq, Ryp = nlf.bootglobalfit(IR1_store,IR2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,pow(mp_phys/(4*pi*fp_phys),2),r"$m^2_{\pi}$",r"$R_{"+str(ic+1)+"}$",nameR,IR3_store,a_store,m3_store)
+            Bpcent, Bcovcent, Bbp, Bbcov, Bbchisq, Byp = nlf.bootglobalfit(IB1_store,IB2_store,1/(ainv[0]*ainv[0]),1/(ainv[1]*ainv[1]),m1_store,m2_store,500,p0,pow(mp_phys/(4*pi*fp_phys),2),r"$m^2_{\pi}$",r"$B_{"+str(ic+1)+"}$",nameB,IB3_store,a_store,m3_store)
             Rphys.append(Ryp)
             Bphys.append(Byp)
 

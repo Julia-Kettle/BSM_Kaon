@@ -13,6 +13,7 @@ def plot_Global(p,function,y1,y2,yerr1, yerr2,m1,m2,mp,a1,a2,xlabel,ylabel,name,
     plt.errorbar(m1[:,-1],y1[:,-1],yerr=yerr1,ecolor='r',fmt='v',color='r',markersize=5,label='24cubed48')
     plt.errorbar(m2[:,-1],y2[:,-1],yerr=yerr2,ecolor='b',fmt='v',color='b',markersize=5,label='32cubed64')
     xmax=plt.xlim()[1]
+    xmin=plt.xlim()[0]
     x = range(0,int(ceil(xmax*100000)))
     f1=[]
     f2=[]
@@ -30,7 +31,6 @@ def plot_Global(p,function,y1,y2,yerr1, yerr2,m1,m2,mp,a1,a2,xlabel,ylabel,name,
     plt.plot(mp,yp,'mo',markersize=6.5,label='continuum limit phys pt')
     plt.plot(mp,p1,'rx',markersize=5)
     plt.plot(mp,p2,'bx',markersize=5)
-    plt.vlines(mp,plt.ylim()[0],plt.ylim()[1],colors='k', linestyles='dashed',label='physical pion mass')
 
     if type(y3)==np.ndarray and type(m3)==np.ndarray and type(yerr3)==np.ndarray:
         phys_lab=['48cubed64 (phys pt)','64cubed128 (phys pt)']
@@ -40,8 +40,11 @@ def plot_Global(p,function,y1,y2,yerr1, yerr2,m1,m2,mp,a1,a2,xlabel,ylabel,name,
 
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
         ncol=3, mode="expand", borderaxespad=0.,prop={'size':7})
+    ylims=plt.ylim()
+    plt.vlines(mp,ylims[0],ylims[1],colors='k', linestyles='dashed',label='physical pion mass')
     plt.xlabel(xlabel,fontsize=16)
     plt.ylabel(ylabel,fontsize=20)
+    plt.ylim(ylims)
     #plt.show()
     plt.savefig(name+'.pdf',format='pdf')
     plt.close()
