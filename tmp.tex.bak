@@ -1,0 +1,85 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\title{BSM Kaon Mixing Global Fit Results}
+
+\begin{document}
+
+\maketitle
+
+
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/B1_Lattice_MOM_KIN}.pdf}
+        \caption{B1 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:B1}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/B2_Lattice_MOM_KIN}.pdf}
+        \caption{B2 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:B2}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/B3_Lattice_MOM_KIN}.pdf}
+        \caption{B3 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:B3}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/B4_Lattice_MOM_KIN}.pdf}
+        \caption{B4 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:B4}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/B5_Lattice_MOM_KIN}.pdf}
+        \caption{B5 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:B5}
+    \end{subfigure}
+    \caption{Bag parameter global fits}\label{fig:Bags}
+\end{figure}
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/R1_Lattice_MOM_KIN}.pdf}
+        \caption{R1 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:R1}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/R2_Lattice_MOM_KIN}.pdf}
+        \caption{R2 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:R2}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/R3_Lattice_MOM_KIN}.pdf}
+        \caption{R3 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:R3}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/R4_Lattice_MOM_KIN}.pdf}
+        \caption{R4 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:R4}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.5\textwidth}
+        \includegraphics[width=\textwidth]{{./plots/R5_Lattice_MOM_KIN}.pdf}
+        \caption{R5 in the Lattice basis in MOM scheme with kinematics KIN. }
+        \label{fig:R5}
+    \end{subfigure}
+    \caption{Ratio global fits}\label{fig:Ratios}
+\end{figure}
+
+\end{document}

@@ -1,0 +1,338 @@
+----------------------setting up as----------------------------
+----------------------setting up as----------------------------
+----------------------setting up as----------------------------
+----------------------setting up as----------------------------
+Reading 2pts...
+Done
+
+Reading 3pts...
+Done
+
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+(5, 3, 1, 501) (5, 3, 1, 501) (501,) (1, 3, 4, 1, 501)
+0
+[[ 0.00875821]
+ [ 0.00876703]
+ [ 0.00950307]]
+1
+[[ 0.13907681]
+ [ 0.14296648]
+ [ 0.15156246]] [[-0.12188183]
+ [-0.11411963]
+ [-0.1143741 ]]
+2
+[[-0.33087406]
+ [-0.33525427]
+ [-0.34940332]] [[ 0.29061241]
+ [ 0.26934115]
+ [ 0.26482613]]
+3
+[[ 0.17543004]
+ [ 0.18437042]
+ [ 0.19312903]] [[-0.15617499]
+ [-0.14810887]
+ [-0.14778474]]
+4
+[[ 0.05149394]
+ [ 0.05387996]
+ [ 0.05627145]] [[-0.04516313]
+ [-0.04308942]
+ [-0.04346553]]
+Reading 2pts...
+Done
+
+Reading 3pts...
+Done
+
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+(5, 3, 1, 501) (5, 3, 1, 501) (501,) (1, 3, 3, 1, 501)
+0
+[[ 0.00866658]
+ [ 0.00886961]
+ [ 0.00891576]]
+1
+[[ 0.15256548]
+ [ 0.15483022]
+ [ 0.15603498]] [[-0.13896284]
+ [-0.14219042]
+ [-0.13809863]]
+2
+[[-0.33733633]
+ [-0.33949304]
+ [-0.3395565 ]] [[ 0.30599289]
+ [ 0.31222018]
+ [ 0.30042795]]
+3
+[[ 0.16913089]
+ [ 0.17157063]
+ [ 0.17335313]] [[-0.15437447]
+ [-0.15666105]
+ [-0.15326788]]
+4
+[[ 0.05600955]
+ [ 0.057108  ]
+ [ 0.05768795]] [[-0.05103941]
+ [-0.05209966]
+ [-0.0511365 ]]
+ Reading Physical point Bag data...
+Done
+
+ Reading Physical point Mass data...
+Done
+
+Done
+
+2 24
+Interpolating physical pt data to true strange physical point
+Interpolating physical pt data to true strange physical point
+(5, 1, 1, 501) (5, 1, 1, 501) (501,) (1, 1, 2, 1, 501)
+0
+[[ 0.00847579]]
+1
+[[ 0.13973448]] [[-0.15112681]]
+2
+[[-0.34046911]] [[ 0.36821144]]
+3
+[[ 0.16237461]] [[-0.17538652]]
+4
+[[ 0.04496748]] [[-0.04856882]]
+ Reading Physical point Bag data...
+Done
+
+ Reading Physical point Mass data...
+Done
+
+Done
+
+3 32
+Interpolating physical pt data to true strange physical point
+Interpolating physical pt data to true strange physical point
+(5, 1, 1, 501) (5, 1, 1, 501) (501,) (1, 1, 2, 1, 501)
+0
+[[ 0.00854915]]
+1
+[[ 0.15138978]] [[-0.15897347]]
+2
+[[-0.33728549]] [[ 0.35444795]]
+3
+[[ 0.16245412]] [[-0.17068296]]
+4
+[[ 0.05369522]] [[-0.05635851]]
+do log value is -  0
+---Doing Global Fitting---
+Scheme -  ms   Basis -  Lattice   Kinematics -  qq   Fit type -  linear
+Channel -  1
+---Fitting Results---
+chisq -  17.2187095862  +/-  8.337031273
+chisq/dof -  2.45981565517 +/- 1.19100446757
+parameters: 
+p0 -  0.965658772976  +/-  0.780623263662
+p1 -  1.90876474545  +/-  0.749459878288
+p2 -  0.0889939212261  +/-  0.710913574064
+---continuum point is: yp =  0.979591343485  +/-  0.0145117322582
+Saving  ./plots/linear/R1_Lattice_ms_qq .pdf
+Channel -  2
+---Fitting Results---
+chisq -  104.562093521  +/-  28.0642323957
+chisq/dof -  14.9374419316 +/- 4.00917605653
+parameters: 
+p0 -  -22.9874957069  +/-  67.4065398507
+p1 -  135.308332259  +/-  66.912066771
+p2 -  13.5690600346  +/-  67.8206639603
+---continuum point is: yp =  -21.9998449846  +/-  0.316016350198
+Saving  ./plots/linear/R2_Lattice_ms_qq .pdf
+Channel -  3
+---Fitting Results---
+chisq -  115.750581544  +/-  29.4400416603
+chisq/dof -  16.5357973634 +/- 4.20572023719
+parameters: 
+p0 -  48.3908361039  +/-  169.696674322
+p1 -  -338.72424057  +/-  168.322577935
+p2 -  -10.278067747  +/-  171.884340281
+---continuum point is: yp =  45.918399741  +/-  0.727216897049
+Saving  ./plots/linear/R3_Lattice_ms_qq .pdf
+Channel -  4
+---Fitting Results---
+chisq -  21.808327579  +/-  11.7659331454
+chisq/dof -  3.11547536843 +/- 1.6808475922
+parameters: 
+p0 -  -21.093696711  +/-  53.0987673306
+p1 -  101.972037068  +/-  52.5574909676
+p2 -  -0.293380613263  +/-  54.0762377647
+---continuum point is: yp =  -20.3493762808  +/-  0.336154662708
+Saving  ./plots/linear/R4_Lattice_ms_qq .pdf
+Channel -  5
+---Fitting Results---
+chisq -  11.7477025003  +/-  8.64842282683
+chisq/dof -  1.67824321433 +/- 1.23548897526
+parameters: 
+p0 -  -7.75508154746  +/-  13.756709673
+p1 -  25.8246751483  +/-  13.5424834541
+p2 -  5.65340520136  +/-  13.545955516
+---continuum point is: yp =  -7.56658052435  +/-  0.105462968827
+Saving  ./plots/linear/R5_Lattice_ms_qq .pdf
+do log value is -  0
+---Doing Global Fitting---
+Scheme -  ms   Basis -  Lattice   Kinematics -  qq   Fit type -  linear
+Channel -  1
+---Fitting Results---
+chisq -  5.56648331331  +/-  5.60973908734
+chisq/dof -  0.795211901901 +/- 0.801391298191
+parameters: 
+p0 -  0.534777172519  +/-  0.261972411962
+p1 -  0.65453720777  +/-  0.285152145314
+p2 -  -0.0260727309976  +/-  0.316695716852
+---continuum point is: yp =  0.539554809899  +/-  0.00239697996435
+Saving  ./plots/linear/B1_Lattice_ms_qq .pdf
+Channel -  2
+---Fitting Results---
+chisq -  15.8491361595  +/-  8.77148638331
+chisq/dof -  2.2641623085 +/- 1.25306948333
+parameters: 
+p0 -  0.684617236785  +/-  0.41632375171
+p1 -  0.486161806181  +/-  0.426011896271
+p2 -  -0.315167173766  +/-  0.439535904786
+---continuum point is: yp =  0.688165858301  +/-  0.00243705288944
+Saving  ./plots/linear/B2_Lattice_ms_qq .pdf
+Channel -  3
+---Fitting Results---
+chisq -  8.86578767258  +/-  6.43747482696
+chisq/dof -  1.26654109608 +/- 0.919639260995
+parameters: 
+p0 -  0.931340073704  +/-  0.445492647246
+p1 -  0.138124640815  +/-  0.411221307729
+p2 -  0.0403526398605  +/-  0.391573113119
+---continuum point is: yp =  0.932348281395  +/-  0.003381793443
+Saving  ./plots/linear/B3_Lattice_ms_qq .pdf
+Channel -  4
+---Fitting Results---
+chisq -  28.3825837872  +/-  10.8752895584
+chisq/dof -  4.05465482674 +/- 1.55361279406
+parameters: 
+p0 -  0.529961132692  +/-  0.408449768463
+p1 -  1.11506612239  +/-  0.425361518473
+p2 -  0.0207954468101  +/-  0.449987386997
+---continuum point is: yp =  0.538100290443  +/-  0.0019938484196
+Saving  ./plots/linear/B4_Lattice_ms_qq .pdf
+Channel -  5
+---Fitting Results---
+chisq -  39.8942045786  +/-  12.9447405629
+chisq/dof -  5.69917208266 +/- 1.84924865185
+parameters: 
+p0 -  0.346264533408  +/-  0.393129393871
+p1 -  0.674737365131  +/-  0.400313218833
+p2 -  -0.297133256653  +/-  0.419095830205
+---continuum point is: yp =  0.351189616993  +/-  0.0013657523407
+Saving  ./plots/linear/B5_Lattice_ms_qq .pdf
+do log value is -  1
+---Doing Global Fitting---
+Scheme -  ms   Basis -  Lattice   Kinematics -  qq   Fit type -  chiral
+Channel -  1
+---Fitting Results---
+chisq -  8.77729594713  +/-  5.99393557275
+chisq/dof -  1.25389942102 +/- 0.856276510393
+parameters: 
+p0 -  0.995330449816  +/-  2.70014474006
+p1 -  6.16901808483  +/-  2.68845428379
+p2 -  0.0632782916969  +/-  2.64207171065
+---continuum point is: yp =  0.986742912693  +/-  0.0142671459339
+Saving  ./plots/chiral/R1_Lattice_ms_qq .pdf
+Channel -  2
+---Fitting Results---
+chisq -  70.4634739642  +/-  22.2471248034
+chisq/dof -  10.0662105663 +/- 3.1781606862
+parameters: 
+p0 -  -23.7286190907  +/-  24.0586118003
+p1 -  34.5884053858  +/-  23.7783923326
+p2 -  14.2385270163  +/-  24.3905909641
+---continuum point is: yp =  -22.1979278534  +/-  0.3084854792
+Saving  ./plots/chiral/R2_Lattice_ms_qq .pdf
+Channel -  3
+---Fitting Results---
+chisq -  84.3561154662  +/-  24.2925247144
+chisq/dof -  12.050873638 +/- 3.47036067348
+parameters: 
+p0 -  49.9617682983  +/-  73.1442306671
+p1 -  -126.999468239  +/-  72.3641001779
+p2 -  -11.6990748668  +/-  75.3076941107
+---continuum point is: yp =  46.343408307  +/-  0.710786846967
+Saving  ./plots/chiral/R3_Lattice_ms_qq .pdf
+Channel -  4
+---Fitting Results---
+chisq -  6.99971529976  +/-  6.80421259483
+chisq/dof -  0.999959328537 +/- 0.97203037069
+parameters: 
+p0 -  -22.2347073025  +/-  23.039095454
+p1 -  -55.2815410021  +/-  23.1626011196
+p2 -  0.72899998275  +/-  21.4417729751
+---continuum point is: yp =  -20.6419768042  +/-  0.326158917461
+Saving  ./plots/chiral/R4_Lattice_ms_qq .pdf
+Channel -  5
+---Fitting Results---
+chisq -  1.37339291401  +/-  3.91840025946
+chisq/dof -  0.196198987715 +/- 0.559771465637
+parameters: 
+p0 -  -8.1643903516  +/-  15.5594288633
+p1 -  -32.0729607114  +/-  15.8299547287
+p2 -  6.00735920257  +/-  15.3994860876
+---continuum point is: yp =  -7.6654955607  +/-  0.102053295429
+Saving  ./plots/chiral/R5_Lattice_ms_qq .pdf
+do log value is -  1
+---Doing Global Fitting---
+Scheme -  ms   Basis -  Lattice   Kinematics -  qq   Fit type -  chiral
+Channel -  1
+---Fitting Results---
+chisq -  7.40546735515  +/-  6.3177597825
+chisq/dof -  1.05792390788 +/- 0.902537111785
+parameters: 
+p0 -  0.529704605868  +/-  0.326540765259
+p1 -  -0.0924014516068  +/-  0.288286927727
+p2 -  -0.0220330471295  +/-  0.257166508745
+---continuum point is: yp =  0.538541580654  +/-  0.00241058802213
+Saving  ./plots/chiral/B1_Lattice_ms_qq .pdf
+Channel -  2
+---Fitting Results---
+chisq -  23.4731042009  +/-  10.5960447605
+chisq/dof -  3.35330060013 +/- 1.51372068007
+parameters: 
+p0 -  0.677492141045  +/-  0.561311835653
+p1 -  -0.463566857355  +/-  0.521619987201
+p2 -  -0.30818377423  +/-  0.486987977789
+---continuum point is: yp =  0.686273572997  +/-  0.00246960569506
+Saving  ./plots/chiral/B2_Lattice_ms_qq .pdf
+Channel -  3
+---Fitting Results---
+chisq -  11.8910305338  +/-  7.56993235083
+chisq/dof -  1.69871864769 +/- 1.08141890726
+parameters: 
+p0 -  0.921500673711  +/-  0.940484868304
+p1 -  -1.15049572942  +/-  0.878041819858
+p2 -  0.050199108645  +/-  0.834017614255
+---continuum point is: yp =  0.929649478466  +/-  0.00340008680932
+Saving  ./plots/chiral/B3_Lattice_ms_qq .pdf
+Channel -  4
+---Fitting Results---
+chisq -  32.6944481206  +/-  11.9610225019
+chisq/dof -  4.6706354458 +/- 1.70871750027
+parameters: 
+p0 -  0.535491405007  +/-  0.740695331759
+p1 -  1.86902851596  +/-  0.758620722356
+p2 -  0.0155637366819  +/-  0.785063977842
+---continuum point is: yp =  0.539518584982  +/-  0.00195667941928
+Saving  ./plots/chiral/B4_Lattice_ms_qq .pdf
+Channel -  5
+---Fitting Results---
+chisq -  42.7462080617  +/-  13.4133275518
+chisq/dof -  6.10660115168 +/- 1.91618965025
+parameters: 
+p0 -  0.349742985171  +/-  0.59019364863
+p1 -  1.16998029191  +/-  0.597991702188
+p2 -  -0.300225083495  +/-  0.620360541105
+---continuum point is: yp =  0.352002950336  +/-  0.001348784597
+Saving  ./plots/chiral/B5_Lattice_ms_qq .pdf

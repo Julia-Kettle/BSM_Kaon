@@ -97,15 +97,18 @@ def Renormalise(ibas,ikin,ibeta,Zfilename,R=[],B=[]):
     N=[0,0,0,0,0]
     for i in range(len(N_ren)):
         for j in range(len(N_ren)):
-                N[i] +=  N_ren[j]*T[i][j] ##Might need to remove N_ren?? Already used on the bag??
+                N[i] +=  N_ren[j]*T[i][j] #IS this the right place to introduce basis change?
     #5by5byNboot+1 times
     if type(R) == np.ndarray and type(B) == np.ndarray:	
+        print "renormalising both"
         ren_B, ren_phys_B, B_phys = MultBZ(B,ZschemeC,ZA,ZP,T,N)
         ren_R, ren_phys_R = MultRZ(R,ZschemeC,T)
     elif type(R) == np.ndarray:
+        print "renormalising R only"
         ren_R, ren_phys_R = MultRZ(R,ZschemeC,T)
         B_phys=[]
     elif type(B) == np.ndarray:
+        print "renormalising b only"
         ren_B, ren_phys_B, B_phys = MultBZ(B,ZschemeC,ZA,ZP,T,N)
         ren_phys_R = []
 

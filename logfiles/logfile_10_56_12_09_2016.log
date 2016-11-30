@@ -1,0 +1,412 @@
+----------------------setting up as----------------------------
+----------------------setting up as----------------------------
+----------------------setting up as----------------------------
+----------------------setting up as----------------------------
+Reading 2pts...
+Done
+
+Reading 3pts...
+Done
+
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+(5, 3, 1, 501) (5, 3, 1, 501) (501,) (1, 3, 4, 1, 501)
+0
+[[ 0.00846689]
+ [ 0.00847541]
+ [ 0.00918697]]
+1
+[[ 0.16137319]
+ [ 0.1695992 ]
+ [ 0.17765751]] [[-0.14367086]
+ [-0.13624837]
+ [-0.13594624]]
+2
+[[-0.05471012]
+ [-0.05759965]
+ [-0.06040744]] [[ 0.04899536]
+ [ 0.04635472]
+ [ 0.04605321]]
+3
+[[-0.2882595 ]
+ [-0.29212046]
+ [-0.30450524]] [[ 0.25318464]
+ [ 0.23467828]
+ [ 0.23079182]]
+4
+[[-0.07105454]
+ [-0.07301832]
+ [-0.07737968]] [[ 0.06227451]
+ [ 0.05829517]
+ [ 0.05840054]]
+Reading 2pts...
+Done
+
+Reading 3pts...
+Done
+
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+-----Interpolating non-physical mass data-----
+Interpolate dR/dms to the near physical point data
+(5, 3, 1, 501) (5, 3, 1, 501) (501,) (1, 3, 3, 1, 501)
+0
+[[ 0.00841087]
+ [ 0.00860791]
+ [ 0.00865269]]
+1
+[[ 0.15680037]
+ [ 0.15905979]
+ [ 0.16071242]] [[-0.14314933]
+ [-0.14526707]
+ [-0.14211928]]
+2
+[[-0.05045491]
+ [-0.05105822]
+ [-0.05159441]] [[ 0.04609783]
+ [ 0.04665019]
+ [ 0.04556892]]
+3
+[[-0.29591858]
+ [-0.29783811]
+ [-0.29791897]] [[ 0.26848982]
+ [ 0.27396244]
+ [ 0.26364257]]
+4
+[[-0.07762621]
+ [-0.07876569]
+ [-0.07936697]] [[ 0.07071365]
+ [ 0.0723521 ]
+ [ 0.0702574 ]]
+ Reading Physical point Bag data...
+Done
+
+ Reading Physical point Mass data...
+Done
+
+Done
+
+Interpolating physical pt data to true strange physical point
+Interpolating physical pt data to true strange physical point
+(5, 1, 1, 501) (5, 1, 1, 501) (501,) (1, 1, 2, 1, 501)
+0
+[[ 0.00854202]]
+1
+[[ 0.16305341]] [[-0.1565301]]
+2
+[[-0.05559006]] [[ 0.05336118]]
+3
+[[-0.29880148]] [[ 0.28705062]]
+4
+[[-0.07255553]] [[ 0.06972978]]
+ Reading Physical point Bag data...
+Done
+
+ Reading Physical point Mass data...
+Done
+
+Done
+
+Interpolating physical pt data to true strange physical point
+Interpolating physical pt data to true strange physical point
+(5, 1, 1, 501) (5, 1, 1, 501) (501,) (1, 1, 2, 1, 501)
+0
+[[ 0.0082969]]
+1
+[[ 0.15061127]] [[-0.15827255]]
+2
+[[-0.04850849]] [[ 0.05099667]]
+3
+[[-0.29584904]] [[ 0.3109634]]
+4
+[[-0.0770395]] [[ 0.08091618]]
+do log value is -  0
+---Doing Global Fitting---
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  0
+---Fitting Results---
+parameters: 
+p0 -  0.965658772313  +/-  0.780623200523
+p1 -  1.90876476622  +/-  0.749459960542
+p2 -  0.0889939222561  +/-  0.710913607372
+
+
+chisq -  17.2187095862  +/-  8.337031273
+chisq/dof -  2.45981565517 +/- 1.19100446757
+---continuum point is: yp =  0.979591342974  +/-  0.014511731149
+Saving  ./plots/linear/R1_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  1
+---Fitting Results---
+parameters: 
+p0 -  -19.5721890086  +/-  34.9763878814
+p1 -  63.3371406344  +/-  34.3698859349
+p2 -  2.8001821093  +/-  35.1672196578
+
+
+chisq -  5.38238760723  +/-  5.81984723829
+chisq/dof -  0.768912515318 +/- 0.831406748327
+---continuum point is: yp =  -19.1098747398  +/-  0.303079901493
+Saving  ./plots/linear/R2_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  2
+---Fitting Results---
+parameters: 
+p0 -  5.90026684353  +/-  11.4841083321
+p1 -  -20.5589528389  +/-  11.3012012036
+p2 -  1.34174930455  +/-  11.7398775718
+
+
+chisq -  4.78002327527  +/-  5.55066884741
+chisq/dof -  0.682860467895 +/- 0.792952692488
+---continuum point is: yp =  5.75020169762  +/-  0.0998430531627
+Saving  ./plots/linear/R3_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  3
+---Fitting Results---
+parameters: 
+p0 -  40.855441758  +/-  87.3510694634
+p1 -  -167.110483378  +/-  86.4590074018
+p2 -  -19.1145751231  +/-  88.6394655147
+
+
+chisq -  9.15026247298  +/-  7.37292473509
+chisq/dof -  1.30718035328 +/- 1.05327496216
+---continuum point is: yp =  39.6356588602  +/-  0.585259566877
+Saving  ./plots/linear/R4_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  4
+---Fitting Results---
+parameters: 
+p0 -  11.2831196789  +/-  20.6527811345
+p1 -  -39.009574043  +/-  20.4372522491
+p2 -  -8.75335498156  +/-  20.7615863236
+
+
+chisq -  10.5850301836  +/-  7.86861441313
+chisq/dof -  1.51214716908 +/- 1.1240877733
+---continuum point is: yp =  10.9983786482  +/-  0.151177297413
+Saving  ./plots/linear/R5_SUSY_MOM_gg .eps
+do log value is -  0
+---Doing Global Fitting---
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  0
+---Fitting Results---
+parameters: 
+p0 -  0.499954041967  +/-  0.197260822118
+p1 -  0.579997840378  +/-  0.209714206081
+p2 -  0.0913291998445  +/-  0.231367263007
+
+
+chisq -  22.1112319848  +/-  10.4005575281
+chisq/dof -  3.15874742639 +/- 1.48579393258
+---continuum point is: yp =  0.504187597111  +/-  0.00349924858303
+Saving  ./plots/linear/B1_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  1
+---Fitting Results---
+parameters: 
+p0 -  0.450626546823  +/-  0.261153289531
+p1 -  0.95467320417  +/-  0.266197425118
+p2 -  0.262869956856  +/-  0.283559487779
+
+
+chisq -  13.5821908524  +/-  7.84295044875
+chisq/dof -  1.94031297892 +/- 1.12042149268
+---continuum point is: yp =  0.457594954932  +/-  0.00279156263207
+Saving  ./plots/linear/B2_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  2
+---Fitting Results---
+parameters: 
+p0 -  0.665174884127  +/-  0.307131589764
+p1 -  1.50872049225  +/-  0.327317813114
+p2 -  0.7585085602  +/-  0.345947520451
+
+
+chisq -  10.0791558862  +/-  6.97238140658
+chisq/dof -  1.43987941231 +/- 0.996054486654
+---continuum point is: yp =  0.676187427546  +/-  0.00495772733412
+Saving  ./plots/linear/B3_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  3
+---Fitting Results---
+parameters: 
+p0 -  0.816207036039  +/-  0.398791806826
+p1 -  0.103505223863  +/-  0.364636234598
+p2 -  0.0433242158169  +/-  0.339786576399
+
+
+chisq -  14.510487334  +/-  8.21379893114
+chisq/dof -  2.072926762 +/- 1.17339984731
+---continuum point is: yp =  0.816962547599  +/-  0.00452996135171
+Saving  ./plots/linear/B4_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  4
+---Fitting Results---
+parameters: 
+p0 -  0.683730502208  +/-  0.393122345827
+p1 -  0.46168764745  +/-  0.393756263766
+p2 -  -0.24228434551  +/-  0.393043621775
+
+
+chisq -  26.0245605675  +/-  10.8896750032
+chisq/dof -  3.71779436679 +/- 1.5556678576
+---continuum point is: yp =  0.687100480472  +/-  0.00349366713712
+Saving  ./plots/linear/B5_SUSY_MOM_gg .eps
+do log value is -  1
+---Doing Global Fitting---
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  0
+---Fitting Results---
+parameters: 
+p0 -  0.995330481753  +/-  2.70014475129
+p1 -  6.16901798947  +/-  2.68845427539
+p2 -  0.0632782012279  +/-  2.64207172186
+
+
+chisq -  8.77729594713  +/-  5.99393557275
+chisq/dof -  1.25389942102 +/- 0.856276510393
+---continuum point is: yp =  0.986742942213  +/-  0.0142671487162
+Saving  ./plots/chiral/R1_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  1
+---Fitting Results---
+parameters: 
+p0 -  -20.5974463814  +/-  35.873236362
+p1 -  -82.6167266114  +/-  36.2760260228
+p2 -  3.66194508671  +/-  34.8899989843
+
+
+chisq -  6.27918458596  +/-  6.12214674413
+chisq/dof -  0.897026369422 +/- 0.874592392019
+---continuum point is: yp =  -19.3512367452  +/-  0.293944806107
+Saving  ./plots/chiral/R2_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  2
+---Fitting Results---
+parameters: 
+p0 -  6.20940250607  +/-  9.46136825062
+p1 -  23.4239303961  +/-  9.52431833683
+p2 -  1.0823766869  +/-  9.0117974232
+
+
+chisq -  6.75735957166  +/-  6.32232680613
+chisq/dof -  0.965337081665 +/- 0.903189543732
+---continuum point is: yp =  5.82289612922  +/-  0.0971580332433
+Saving  ./plots/chiral/R3_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  3
+---Fitting Results---
+parameters: 
+p0 -  42.095358982  +/-  25.0316631164
+p1 -  11.9766700379  +/-  25.1138553296
+p2 -  -20.0878607294  +/-  24.5329821088
+
+
+chisq -  6.25770450528  +/-  6.34545035199
+chisq/dof -  0.893957786468 +/- 0.906492907427
+---continuum point is: yp =  39.9151724435  +/-  0.572534444858
+Saving  ./plots/chiral/R4_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  R
+Channel -  4
+---Fitting Results---
+parameters: 
+p0 -  11.6261197619  +/-  9.33693656969
+p1 -  10.4888489065  +/-  9.51745652437
+p2 -  -9.02628589772  +/-  9.05941625719
+
+
+chisq -  5.85926706271  +/-  6.12627111574
+chisq/dof -  0.837038151816 +/- 0.875181587963
+---continuum point is: yp =  11.0764007553  +/-  0.147949640918
+Saving  ./plots/chiral/R5_SUSY_MOM_gg .eps
+do log value is -  1
+---Doing Global Fitting---
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  0
+---Fitting Results---
+parameters: 
+p0 -  0.495196887549  +/-  0.310323397676
+p1 -  -0.118228731533  +/-  0.269308601308
+p2 -  0.0951778649211  +/-  0.23254080972
+
+
+chisq -  24.225579497  +/-  10.8182302146
+chisq/dof -  3.460797071 +/- 1.54546145923
+---continuum point is: yp =  0.503225717727  +/-  0.00349315189791
+Saving  ./plots/chiral/B1_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  1
+---Fitting Results---
+parameters: 
+p0 -  0.455352938699  +/-  0.560577374403
+p1 -  1.59577389719  +/-  0.565152402782
+p2 -  0.258292679072  +/-  0.582236709615
+
+
+chisq -  16.659176437  +/-  8.81454123859
+chisq/dof -  2.37988234814 +/- 1.25922017694
+---continuum point is: yp =  0.458824537662  +/-  0.00279142071448
+Saving  ./plots/chiral/B2_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  2
+---Fitting Results---
+parameters: 
+p0 -  0.671802029195  +/-  0.760223626211
+p1 -  2.45745882698  +/-  0.777577773166
+p2 -  0.752735597605  +/-  0.792676213759
+
+
+chisq -  12.5075118175  +/-  7.79086047992
+chisq/dof -  1.7867874025 +/- 1.11298006856
+---continuum point is: yp =  0.677676705815  +/-  0.00495471066867
+Saving  ./plots/chiral/B3_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  3
+---Fitting Results---
+parameters: 
+p0 -  0.807551905318  +/-  0.830175528814
+p1 -  -1.02575510929  +/-  0.776784271752
+p2 -  0.0521219576158  +/-  0.740847083619
+
+
+chisq -  17.7779747657  +/-  9.11784201797
+chisq/dof -  2.53971068082 +/- 1.30254885971
+---continuum point is: yp =  0.814565147081  +/-  0.00452433759788
+Saving  ./plots/chiral/B4_SUSY_MOM_gg .eps
+Scheme -  MOM   Basis -  SUSY   Kinematics -  gg
+Doing  B
+Channel -  4
+---Fitting Results---
+parameters: 
+p0 -  0.676586157279  +/-  0.562346894557
+p1 -  -0.486606958376  +/-  0.519358865154
+p2 -  -0.23519094336  +/-  0.480359448032
+
+
+chisq -  33.6731689146  +/-  12.3372605524
+chisq/dof -  4.81045270209 +/- 1.7624657932
+---continuum point is: yp =  0.68518314559  +/-  0.00350633848604
+Saving  ./plots/chiral/B5_SUSY_MOM_gg .eps
