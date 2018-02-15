@@ -7,40 +7,39 @@ import utils
 from lattice import Lattice
 
 
-def main(lat,smeared,ikin,ibas,ischeme,dR=None,dB=None,old=False,fine=False):
+def main(lat,smeared,ikin,ibas,ischeme,dR=None,dB=None,old=False,fine=False,am48=False,ainv=1):
 
     lattice=Lattice(lat,smeared,old=old,fine=fine)
     lat = lattice.name #if smeared == True else lattice.name+"cubed"
     print "-------------------------------------"
     print lattice.name
     print "-------------------------------------"
-    if old == False:
-        m = np.load("../unrenormalised/m_"+str(lat)+".bin")
-        f = np.load("../unrenormalised/f_"+str(lat)+".bin")
-        m_4pif_sq = np.load("../unrenormalised/m_4pif_sq"+str(lat)+".bin")
-        B = np.load("../unrenormalised/B_"+str(lat)+".bin")
-        R = np.load("../unrenormalised/R_"+str(lat)+".bin")
-    else:
-        m = np.load("../unrenormalised/m_"+str(lat)+"old.bin")
-        f = np.load("../unrenormalised/f_"+str(lat)+"old.bin")
-        m_4pif_sq = np.load("../unrenormalised/m_4pif_sq"+str(lat)+"old.bin")
-        B = np.load("../unrenormalised/B_"+str(lat)+"old.bin")
-        R = np.load("../unrenormalised/R_"+str(lat)+"old.bin")
+    kin=['E','qq','gg'][ikin] 
+    bas=['SUSY','Lattice'][ibas]
+    scheme=['MOM','ms'][ischeme]
+    try:
+        if old == False:
+            m = np.load("../unrenormalised/m_"+str(lat)+".bin")
+            f = np.load("../unrenormalised/f_"+str(lat)+".bin")
+            m_4pif_sq = np.load("../unrenormalised/m_4pif_sq_"+str(lat)+".bin")
+            B = np.load("../unrenormalised/B_"+str(lat)+".bin")
+            R = np.load("../unrenormalised/R_"+str(lat)+".bin")
+        else:
+            m = np.load("../unrenormalised/m_"+str(lat)+"old.bin")
+            f = np.load("../unrenormalised/f_"+str(lat)+"old.bin")
+            m_4pif_sq = np.load("../unrenormalised/m_4pif_sq_"+str(lat)+"old.bin")
+            B = np.load("../unrenormalised/B_"+str(lat)+"old.bin")
+            R = np.load("../unrenormalised/R_"+str(lat)+"old.bin")
+    except:
+        print "failed"
+        return
 
-    print "B - ",B[:,:,:,-1]
-    print "R - ",R[:,:,:,-1]
-    renorm=Renormalisation(lattice,ischeme,ikin,ibas)
-    R=renorm.Renorm_R(R)
-    B=renorm.Renorm_B(B)
-
-    #bfo = open("renormalised/B_"+str(lat)+".bin",'w')
-    #np.save(bfo,B)
-    #bfo.close()
-    #rfo = open("renormalised/R_"+str(lat)+".bin",'w')
-    #np.save(rfo,R)
-    #rfo.close()
-
-
+    try:
+        renorm=Renormalisation(lattice,ischeme,ikin,ibas)
+    except:
+        return
+    R=renorm.renorm_R(R)
+    B=renorm.renorm_B(B)
 
     if len(lattice.m_val_s)==1:
         if lattice.m_val_s != lattice.m_s_phys:
@@ -50,8 +49,10 @@ def main(lat,smeared,ikin,ibas,ischeme,dR=None,dB=None,old=False,fine=False):
             else:
                 print "adjusting the phys pt data"
                 sa=StrangeAdjustment(lattice)
+                print "R before - ", R[:,:,:,-1]
                 R = sa.extrap_1pt(R,dR)
                 B = sa.extrap_1pt(B,dB)
+                print "R after -", R[:,:,-1]
 
         else:
             B=B[:,:,0,:]
@@ -69,115 +70,44 @@ def main(lat,smeared,ikin,ibas,ischeme,dR=None,dB=None,old=False,fine=False):
         sa=StrangeAdjustment(lattice)
         B,dB = sa.interpolation(B)
         R,dR = sa.interpolation(R)
-        print dR[:,:,-1]
         #dB = dB[:,0,:]
         #dR = dR[:,0,:]
+        if am48 == True :
+            lattice.m_l_phys[0] = 0.002144*2.774/ainv
         dB = sa.slope_extrap(dB,lattice.m_l_phys)
         dR = sa.slope_extrap(dR,lattice.m_l_phys)
 
-        '''
-        bfo = open("renormalised/B_int"+str(lat)+".bin",'w')
-        np.save(bfo,B)
-        bfo.close()
-        rfo = open("renormalised/R_int"+str(lat)+".bin",'w')
-        np.save(rfo,R)
-        rfo.close()
-        '''
-    
     for iml in range(len(lattice.m_sea_l)):
         if old == False:
-            rfo = open("../renormalised/R_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+".bin",'w')
-            bfo = open("../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+".bin",'w')
-            mfo = open("../renormalised/m_4pif_sq_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+".bin",'w')
+            rfo = open("../renormalised/R_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w')
+            bfo = open("../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w')
+            mfo = open("../renormalised/m_4pif_sq_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w')
+            ffo = open("../renormalised/f_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w')
         else:
-            rfo = open("../renormalised/R_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_old.bin",'w')
-            bfo = open("../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_old.bin",'w')
-            mfo = open("../renormalised/m_4pif_sq_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_old.bin",'w')
+            rfo = open("../renormalised/R_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+"_old.bin",'w')
+            bfo = open("../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+"_old.bin",'w')
+            mfo = open("../renormalised/m_4pif_sq_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w')
+            ffo = open("../renormalised/f_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+"_old.bin",'w')
 
         np.save(bfo,B[:,iml,:])
         np.save(rfo,R[:,iml,:])
-        np.save(mfo,m_4pif_sq[0,iml,-1,:])
-
+        np.save(mfo,m_4pif_sq[iml,-1,:])
+        np.save(ffo,f[iml,-1,:])
 
     return B,R,dB,dR
 
-    '''
-    for ml in lattice.m_sea_l:
-    
-    
-    bfo = open("renormalised/B_"+str(lat)+"cubed.bin",'w')
-    rfo = open("renormalised/R_"+str(lat)+"cubed.bin",'w')
-    np.save(bfo,B)
-    np.save(rfo,R)
-
-    bfo = open("renormalised/B_int"+str(lat)+"cubed.bin",'w')
-    rfo = open("renormalised/R_int"+str(lat)+"cubed.bin",'w')
-    np.save(bfo,B[:,:,0,:])
-    np.save(rfo,R[:,:,0,:])
-    '''
-
-    '''
-        Old code for strange adjustment - already done for 64 - not needed elsewhere now
-    sa = StrangeAdjustment(lattice)
-    print lat
-    if lat == 32:
-        print "32 hit"
-        R, dR = sa.interpolation(R)
-        B, dB = sa.interpolation(B)
-        dR = sa.slope_extrap(dR,0.000678)
-        dB = sa.slope_extrap(dB,0.000678)
-    elif lat == 64:
-        R = sa.extrap_1pt(R,dR)
-        B = sa.extrap_1pt(B,dB)
-    else:
-        R = R[:,:,0,:]
-        B = B[:,:,0,:]
-    
-    bfo = open("renormalised/B_int"+str(lat)+"cubed.bin",'w')
-    rfo = open("renormalised/R_int"+str(lat)+"cubed.bin",'w')
-    np.save(bfo,B)
-    np.save(rfo,R)
-    
-    if lat == 64:
-        bfo = open("renormalised/B_int"+str(lat)+"cubed.bin",'r')
-        rfo = open("renormalised/R_int"+str(lat)+"cubed.bin",'r')
-        B=np.load(bfo)
-        R=np.load(rfo)
-    else:
-        print str(lat) + str(ibas) + str(ikin) +str(ischeme)
-        
-        B = np.load("../unrenormalised/B_"+str(lat)+"cubed.bin")
-        R = np.load("../unrenormalised/R_"+str(lat)+"cubed.bin")
-
-        
-        bfo = open("renormalised/B_"+str(lat)+"cubed.bin",'r')
-        rfo = open("renormalised/R_"+str(lat)+"cubed.bin",'r')
-        B=np.load(bfo)
-        R=np.load(rfo)
-        
-    for i in range(len(lattice.m_sea_l)):
-        betas.append(count)
-        storeB.append(np.squeeze(B[:,i,:]))
-        storeR.append(np.squeeze(R[:,i,:]))
-        storem2.append(np.squeeze(m_4pif_sq[:,i,-1,:]))
-        storea2.append(np.squeeze(lattice.a2))
-    '''
-
-
-for ibas in range(1):
-    for ikin in range(1):
-        for ischeme in range(1):
-            ikin=1
+for ibas in range(2):
+    for ikin in range(2):
+        for ischeme in range(2):
+            ikin=2
             ibas=0
-            ischeme=0
-
-
+            print ['E','qq','gg'][ikin], ['SUSY','Lattice'][ibas], ['MOM','ms'][ischeme]
+            '''
             main(24,False,ikin,ibas,ischeme)
-            main(24,True,ikin,ibas,ischeme)
             main(32,False,ikin,ibas,ischeme)
-            B,R,dB,dR=main(24,False,ikin,ibas,ischeme,old=True)
-            main(48,False,ikin,ibas,ischeme,dB=dB,dR=dR)
-            main(48,False,ikin,ibas,ischeme,fine=True)
             main(48,True,ikin,ibas,ischeme)
-            B,R,dB,dR=main(32,False,ikin,ibas,ischeme,old=True)
-            main(64,False,ikin,ibas,ischeme,dB=dB,dR=dR)
+            main(64,True,ikin,ibas,ischeme)
+            main(32,True,ikin,ibas,ischeme)
+            main(48,False,ikin,ibas,ischeme,fine=True)
+            '''
+            main(48,True,ikin,ibas,ischeme,fine=True)

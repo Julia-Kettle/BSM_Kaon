@@ -3,12 +3,12 @@ import file_io
 
 class Lattice:
     def __init__(self,l,smeared,old=False,fine=False):
-        print "0ld is - ", old
         self.dim = str(l)+"^3"
         self.smeared = smeared #boolean value
         self.fine = fine
-        self.name = str(l) +"smeared" if smeared==True else str(l)+"fine" if fine==True else str(l)
-        print self.name
+        self.name = str(l)
+        self.name = self.name+"fine" if fine==True else self.name
+        self.name = self.name+"smeared" if self.smeared==True else self.name
         if old == True:
             fi = open("../lattice_setup/lattice_setup_" + self.name+"_old.txt",'r')
         else:
@@ -21,13 +21,11 @@ class Lattice:
         self.m_l_phys =[float(i) for i in line.split()]
         line =fi.readline()
         self.m_s_phys=[float(i) for i in line.split()]
-        print self.m_sea_l
         #read in the lattice spacing bootstraps and set central values.
         filename = '../common_data/boot_ainv_'+str(l)+'cubed_IW_'+str(500) if fine==False else '../common_data/boot_ainv_'+str(l)+'cubedfine_IW_'+str(500)
-        print "a filename -", filename
         self.bootainv = file_io.read_file_list(filename)
         ainv_cent = {'24':1.7848,'32':2.3833,'48':1.7295,'64':2.3586,'48fine':2.774}
-        self.bootainv[-1] = ainv_cent[str(l)] if fine==False else ainv_cent[str(self.name)]
+        self.bootainv[-1] = ainv_cent[str(l)] if fine==False else ainv_cent[str(l)+"fine"]
         self.a2 = []
         for b in range(len(self.bootainv)):
             self.a2.append(pow(self.bootainv[b],-2))

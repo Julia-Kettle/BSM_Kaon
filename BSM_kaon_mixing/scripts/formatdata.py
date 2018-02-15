@@ -4,25 +4,29 @@ import file_io
 import numpy as np
 from lattice import Lattice
 
-def calcR(matel_3p_rat,b_F,b_M):
-    '''
-    Calculates the  matrix (5,ml,ms,boots) of the ratios
-    '''
-    dim = []
-    dim1 = np.shape(matel_3p_rat)
-    dim2 = np.shape(b_F)
-    for i in range(len(dim1)):
-        dim.append(min(dim1[i],dim2[i]))
-    dim[0] = 5
-    R = np.zeros(dim)
+def calcR(matel_3p_rat,bdecay,bmass):
+    """
+    Calculates the ratios defined as R=(fK/mK)^2_exp * (m_K/f_K)^2_lat * <Oi>/<O1>
+    """
+
     Mkphys = 0.5*(493.677+497.614)*pow(10,-3)
     Fkphys = 156.2*pow(10,-3)
-    for index, val in np.ndenumerate(R):
-        if index[0] == 0:
-            R[index] = pow((Fkphys/Mkphys),2)*pow((b_M[index])/b_F[index],2)
-        else:
-            R[index] = pow((Fkphys/Mkphys),2)*pow((b_M[(0,)+index[1:]])/b_F[(0,)+index[1:]],2)*matel_3p_rat[(index[0]-1,) + index[1:]]
+
+    R=np.empty_like(matel_3p_rat)
+
+    #only the kaon data needed - discard pion
+    bmK = bmass[:,:-1,:]
+    bfK = bdecay[:,:-1,:]
+
+    for ich in range(np.size(R,0)):
+        R[ich] = pow(Fkphys/Mkphys,2)*pow(bmK/bfK,2)*matel_3p_rat[ich]
     return R
+
+def numpysave(filename,array):
+    #save array to binary file using numpy
+    fo=open(filename,'w')
+    np.save(fo,array)
+    fo.close()
 
 def save_olddata(lattice):
     """
@@ -31,30 +35,24 @@ def save_olddata(lattice):
     msea = lattice.m_sea_l
     ms = lattice.m_val_s
     mval = np.hstack([msea,ms])
-    latticedim = lattice.name
     nboots=500
 
-    filename = '../data/boot_matel_'+latticedim +'cubed_IW_3p_over_2p.txt'
+    filename = '../data/boot_matel_'+lattice.name +'cubed_IW_3p_over_2p.txt'
     matel_3p_2p = np.zeros([len(msea),len(ms),5,nboots+1])
     file_io.read_file_array(filename,matel_3p_2p) #3pt/(2pt*2pt) ~ Bag
-    matel_3p_2p = np.swapaxes(matel_3p_2p,0,2)
-    matel_3p_2p = np.swapaxes(matel_3p_2p,1,2)
 
-    filename = '../data/boot_matel_'+latticedim +'cubed_IW_3p.txt'
-    matel_3p=np.zeros([len(msea),len(ms),5,nboots+1])
+    filename = '../data/boot_matel_'+lattice.name +'cubed_IW_3p.txt'
+    matel_3p=np.empty_like(matel_3p_2p)
     file_io.read_file_array(filename,matel_3p) #3pt
-    matel_3p = np.swapaxes(matel_3p,0,2)
-    matel_3p = np.swapaxes(matel_3p,1,2)
 
-    filename = '../data/boot_matel_'+latticedim +'cubed_IW_3p_rat.txt'
-    matel_3p_rat = np.zeros([len(msea),len(ms),4,nboots+1])
-    file_io.read_file_array(filename,matel_3p_rat) #3pt1/3pti ~ R
-    matel_3p_rat = np.swapaxes(matel_3p_rat,0,2)
-    matel_3p_rat = np.swapaxes(matel_3p_rat,1,2)
+    filename = '../data/boot_matel_'+lattice.name +'cubed_IW_3p_rat.txt'
+    matel_3p_rat = np.ones_like(matel_3p_2p)
+    #fill raw ratios array with data, leaving channel 0 as one. 
+    file_io.read_file_array(filename,matel_3p_rat[:,:,1:,:]) #3pt1/3pti ~ R
 
-    b_F = np.zeros([1,len(msea),len(ms)+1,nboots+1])
-    b_M = np.zeros([1,len(msea),len(ms)+1,nboots+1])
-    b_msq_fsq = np.zeros([1,len(msea),len(ms)+1,nboots+1])
+    b_F = np.zeros([len(msea),len(ms)+1,nboots+1])
+    b_M = np.zeros_like(b_F)
+    b_msq_fsq = np.zeros_like(b_F)
 
     filend_basis = '_9.22' if lattice.name=='24' else '_12.52'
     for i in range(len(msea)):
@@ -65,167 +63,127 @@ def save_olddata(lattice):
                 n, nboot, dataF = file_io.read_results_Jamie(filenameF)
                 n, nboot, dataM = file_io.read_results_Jamie(filenameM)
                 for l in range(len(dataM)):
-                    b_F[0,i,j,l] = dataF[l]
-                    b_M[0,i,j,l] = dataM[l]
-                    b_msq_fsq[0,i,j,l]= pow((b_M[0,i,j,l]/(4*np.pi*b_F[0,i,j,l])),2)
-    print b_F[0,:,:,-1]
-    print b_M[0,:,:,-1]
+                    b_F[i,j,l] = dataF[l]
+                    b_M[i,j,l] = dataM[l]
+                    b_msq_fsq[i,j,l]= pow((b_M[i,j,l]/(4*np.pi*b_F[i,j,l])),2)
     R=calcR(matel_3p_rat,b_F,b_M)
+    try:
+        numpysave("../unrenormalised/B_"+lattice.name+".bin",matel_3p_2p)
+    except:
+        pass
+    numpysave("../unrenormalised/R_"+lattice.name+".bin",R)
+    numpysave("../unrenormalised/m_"+lattice.name+".bin",b_M)
+    numpysave("../unrenormalised/f_"+lattice.name+".bin",b_F)
+    numpysave("../unrenormalised/m_4pif_sq_"+lattice.name+".bin",b_msq_fsq)
 
-    bag_out = "../unrenormalised/B_"+latticedim+"old.bin"
-    ratio_out="../unrenormalised/R_"+latticedim+"old.bin"
-    mass_out="../unrenormalised/m_"+latticedim+"old.bin"
-    decay_out="../unrenormalised/f_"+latticedim+"old.bin"
-    mass_decay_out="../unrenormalised/m_4pif_sq"+latticedim+"old.bin"
-    fo=open(bag_out,'w')
-    np.save(fo,matel_3p_2p)
-    fo.close()
 
-    fo=open(ratio_out,'w')
-    np.save(fo,R)
-    fo.close()
-
-    fo=open(mass_out,'w')
-    np.save(fo,b_M)
-    fo.close()
-
-    fo=open(decay_out,'w')
-    np.save(fo,b_F)
-    fo.close()
-
-    fo=open(mass_decay_out,'w')
-    np.save(fo,b_msq_fsq)
-    fo.close()
-
-def save_mydata(lattice,dt):
+def save_mydata(lattice):
     """
     Reads in the new physical point bags and bare ratios
     """
+    print "-------------------------------------------"
     print lattice.name
+    print "-------------------------------------------"
+
     ms  = deepcopy(lattice.m_val_s)
     msea = deepcopy(lattice.m_sea_l)
-    print len(msea)
     mval = np.hstack([msea,ms])
-    #lat = lattice.lattice_name+["cubed","cubed","smeared","cubed"][self.ibeta]
+
     lat = lattice.name+'cubed' if lattice.smeared ==False and lattice.fine  == False else lattice.name
     Ninv = [3.0/8,3.0/4,-0.5,3.0/5,1.0] #removes scaling to be consistent with Nicolas, re-added in later.
+    #Ninv = [1.0,1.0,1.0,1.0,1.0]
     nboots=500
+
     matel_3p_2p = np.zeros([5,len(msea),1,nboots+1])
-    matel_3p_rat = np.zeros([4,len(msea),1,nboots+1])
+    matel_3p_rat = np.ones_like(matel_3p_2p)
+
+    b_M=np.zeros([len(msea),2,nboots+1])
+    b_F=np.zeros_like(b_M)
+    b_msq_fsq=np.zeros_like(b_M)
+
     for isea in range(len(msea)):
-        kaon = 's' + str(ms[0]) + '-l'+ str(msea[isea])
+        #pion and kaon name
+        mesons = ['s'+str(ms[0])+'-l'+str(msea[isea]),'l'+str(msea[isea])+'-l'+str(msea[isea])]
+
+        #Read the 3pt data looping through the channels 
         for ic in range(5):
+            # 3 & 4 need to switched - convention choice
+            if ic == 2:     chan=str(2*ic+2)
+            elif ic ==3:    chan=str(2*ic-2)
+            else:           chan=str(2*ic)
+
+            filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +chan + '/3ptrat-' + mesons[0] + '/3ptrat-'+ mesons[0] +'_boots.dat'
+            filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' + chan + '/bag-' + mesons[0] + '/bag-' + mesons[0] +'_boots.dat'
+            #Read bag parameters and remove renormalisation - matches Nicolas' convention.
             try:
-                # 3 & 4 need to switched - convention choice
-                if ic == 2:
-                    filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +str(2*ic+2) + '/3ptrat-' + kaon + '-dt'+str(dt)+'/3ptrat-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                    filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' +str(2*ic+2) + '/bag-' + kaon + '-dt'+str(dt)+'/bag-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                elif ic ==3:
-                    filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +str(2*ic-2) + '/3ptrat-' + kaon + '-dt'+str(dt)+'/3ptrat-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                    filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' +str(2*ic-2) + '/bag-' + kaon + '-dt'+str(dt)+'/bag-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                else:
-                    filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +str(2*ic) + '/3ptrat-' + kaon + '-dt'+str(dt)+'/3ptrat-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                    filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' +str(2*ic) + '/bag-' + kaon + '-dt'+str(dt)+'/bag-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-
                 file_io.read_file_array(filenameB,matel_3p_2p[ic,isea])
+                matel_3p_2p[ic,isea] = matel_3p_2p[ic,isea]/Ninv[ic]
+                print matel_3p_2p[ic,isea,:,-1]
+                #Read ratio parameters for the BSM leaving SM channel 1 as 1. 
                 if ic > 0:
-                    file_io.read_file_array(filenameR,matel_3p_rat[ic-1,isea])
+                    file_io.read_file_array(filenameR,matel_3p_rat[ic,isea])
             except:
-                dt=26
-                if ic == 2:
-                    filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +str(2*ic+2) + '/3ptrat-' + kaon + '-dt'+str(dt)+'/3ptrat-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                    filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' +str(2*ic+2) + '/bag-' + kaon + '-dt'+str(dt)+'/bag-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                elif ic ==3:
-                    filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +str(2*ic-2) + '/3ptrat-' + kaon + '-dt'+str(dt)+'/3ptrat-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                    filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' +str(2*ic-2) + '/bag-' + kaon + '-dt'+str(dt)+'/bag-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                else:
-                    filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +str(2*ic) + '/3ptrat-' + kaon + '-dt'+str(dt)+'/3ptrat-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-                    filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' +str(2*ic) + '/bag-' + kaon + '-dt'+str(dt)+'/bag-s'+ str(ms[0]) + '-l' + str(msea[isea]) +'-dt'+str(dt)+'_boots.dat'
-
-                file_io.read_file_array(filenameB,matel_3p_2p[ic,isea])
                 if ic > 0:
-                    file_io.read_file_array(filenameR,matel_3p_rat[ic-1,isea])
+                    file_io.read_file_array(filenameR,matel_3p_rat[ic,isea])
+        #read pion and kaon masses and decay constants
+        for imeson in range(len(mesons)):
+            #set up filenames & read data for mass and decay constant
+            try: 
+                filenamef='/Users/s1035546/Fits/' + lat + '/sim_mass/sim_mass-' + mesons[imeson] + '/decay-' + mesons[imeson] +'_boots.dat'
+                filenamem='/Users/s1035546/Fits/' + lat + '/sim_mass/sim_mass-' + mesons[imeson] + '/sim_mass-' + mesons[imeson] +'_boots.dat'
+                file_io.read_file_array(filenamem,b_M[isea,imeson])
+                file_io.read_file_array(filenamef,b_F[isea,imeson])
+            except:
+                filenamef='/Users/s1035546/Fits/' + lat + '/sim_mass_PPSS_AASS_PASL_AASL/sim_mass_PPSS_AASS_PASL_AASL-' + mesons[imeson] + '/decay-' + mesons[imeson] +'_boots.dat'
+                filenamem='/Users/s1035546/Fits/' + lat + '/sim_mass_PPSS_AASS_PASL_AASL/sim_mass_PPSS_AASS_PASL_AASL-' + mesons[imeson] + '/sim_mass_PPSS_AASS_PASL_AASL-' + mesons[imeson] +'_boots.dat'
+                file_io.read_file_array(filenamem,b_M[isea,imeson])
+                file_io.read_file_array(filenamef,b_F[isea,imeson])
+                
+            #calculate ratio of m/f for x axis data
             for iboot in range(nboots+1):
-                matel_3p_2p[ic,isea,:,iboot] = matel_3p_2p[ic,isea,:,iboot]/Ninv[ic]
-    
-    b_M=np.zeros([1,len(msea),2,nboots+1])
-    b_F=np.zeros([1,len(msea),2,nboots+1])
-    b_msq_fsq=np.zeros([1,len(msea),2,nboots+1])
-    for isea in range(len(msea)):
-        kaon = 's' + str(ms[0]) + '-l'+ str(msea[isea])
-        print msea[isea]
-        if lat == '24smeared':
-            kaon = 'l'+ str(msea[isea]) + '-s' + str(ms[0])
-        for imv2 in range(2):
-            if imv2 == 1:
-                meson = 'l' + str(msea[isea]) + '-l' + str(msea[isea])
-            elif imv2 == 0:
-                meson = kaon
-            print meson
-            #set up matrices
-            #set up filenames & read data
-            filenameF='/Users/s1035546/Fits/' + lat + '/mass/mass-' + meson + '/decay-' + meson +'_boots.dat'
-            filenameM='/Users/s1035546/Fits/' + lat + '/mass/mass-' + meson + '/mass-' + meson +'_boots.dat'
-            #filenameF='/Users/s1035546/Fits/' + lat + '/sim_mass/sim_mass-' + meson + '/decay-' + meson +'_boots.dat'
-            #filenameM='/Users/s1035546/Fits/' + lat + '/sim_mass/sim_mass-' + meson + '/sim_mass-' + meson +'_boots.dat'
-            print filenameM
-            file_io.read_file_array(filenameM,b_M[0,isea,imv2,:])
-            file_io.read_file_array(filenameF,b_F[0,isea,imv2,:])
-            for iboot in range(nboots+1):
-                b_msq_fsq[0,isea,imv2,iboot] = pow((b_M[0,isea,imv2,iboot]/(4*np.pi*b_F[0,isea,imv2,iboot])),2)
+                b_msq_fsq[isea,imeson,iboot] = pow((b_M[isea,imeson,iboot]/(4*np.pi*b_F[isea,imeson,iboot])),2)
 
     R=calcR(matel_3p_rat,b_F,b_M)
-    print "R - ", R[:,:,-1]
-    bag_out = "../unrenormalised/B_"+lattice.name+".bin"
-    ratio_out="../unrenormalised/R_"+lattice.name+".bin"
-    mass_out="../unrenormalised/m_"+lattice.name+".bin"
-    decay_out="../unrenormalised/f_"+lattice.name+".bin"
-    mass_decay_out="../unrenormalised/m_4pif_sq"+lattice.name+".bin"
+    numpysave("../unrenormalised/B_"+lattice.name+".bin",matel_3p_2p)
+    numpysave("../unrenormalised/R_"+lattice.name+".bin",R)
+    numpysave("../unrenormalised/m_"+lattice.name+".bin",b_M)
+    numpysave("../unrenormalised/f_"+lattice.name+".bin",b_F)
+    numpysave("../unrenormalised/m_4pif_sq_"+lattice.name+".bin",b_msq_fsq)
 
-    fo=open(bag_out,'w')
-    np.save(fo,matel_3p_2p)
-    fo.close()
+    print R[:,:,-1]
+    print matel_3p_2p[:,:,-1]
+    print b_M[:,:,-1]
+    print b_F[:,:,-1]
 
-    fo=open(ratio_out,'w')
-    np.save(fo,R)
-    fo.close()
-
-    fo=open(mass_out,'w')
-    np.save(fo,b_M)
-    fo.close()
-
-    fo=open(decay_out,'w')
-    np.save(fo,b_F)
-    fo.close()
-
-    fo=open(mass_decay_out,'w')
-    np.save(fo,b_msq_fsq)
-    fo.close()
-'''
-lat24=Lattice(24,False)
-save_mydata(lat24,24)
-print "new 24 done"
-lat24=Lattice(24,True)
-save_mydata(lat24,32)
-print "new 24 smeared done"
-lat32=Lattice(32,False)
-save_mydata(lat32,32)
-print "new 32 done"
-lat32=Lattice(32,False,True)
-save_olddata(lat32)
-print "old 32 done"
-lat24=Lattice(24,False,True)
-save_olddata(lat24)
-print "old 24 done"
-'''
-#lat48=Lattice(48,False)
-#save_mydata(lat48,40)
-print "48 done"
-lat48=Lattice(48,True)
-save_mydata(lat48,40)
-#lat48fine=Lattice(48,False,fine=True)
-#save_mydata(lat48fine,40)
-print "48 smeared done"
-#lat64=Lattice(64,False)
-#save_mydata(lat64,52)
-print "64 done"
+def main():
+    lat48finesmeared=Lattice(48,True,fine=True)
+    save_mydata(lat48finesmeared)
+    '''
+    lat24=Lattice(24,False)
+    save_mydata(lat24)
+    print "new 24 done"
+    lat32=Lattice(32,False)
+    save_mydata(lat32)
+    print "new 32 done"
+    #lat32=Lattice(32,False,True)
+    #save_olddata(lat32)
+    print "old 32 done"
+    #lat24=Lattice(24,False,True)
+    #save_olddata(lat24)
+    print "old 24 done"
+    print "48 done"
+    lat48=Lattice(48,True)
+    save_mydata(lat48)
+    lat48fine=Lattice(48,False,fine=True)
+    save_mydata(lat48fine)
+    print "48 smeared done"
+    lat64=Lattice(64,False)
+    save_mydata(lat64)
+    lat64=Lattice(64,True)
+    save_mydata(lat64)
+    #print "64 done"
+    lat32smeared=Lattice(32,True)
+    save_mydata(lat32smeared)
+    '''
+if __name__ == "__main__":
+    main()

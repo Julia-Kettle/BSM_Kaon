@@ -1,5 +1,6 @@
 import numpy as np
-
+import os
+'''
 def str5sf(number):
     num_str = str(number)
     while len(num_str) <= 5:
@@ -61,5 +62,50 @@ def diagonalize(A):
         for i in range(dim):
             B[i] = A[i,i]
         return B
+'''
+def chiral_log_coeffs(param,ansatz,basis):
+    #ugly code to return chiral log coeff
+    if ansatz == 'linear':
+        coeff = [0,0,0,0,0]
+    elif ansatz == 'chiral':
+        if param=='R':
+            if basis=='SUSY':
+                coeff=[1.5,1.5,1.5,2.5,2.5]
+            elif basis=='Lattice':
+                coeff=[1.5,2.5,2.5,1.5,1.5]
+        elif param=='B':
+            if basis=='SUSY':
+                coeff=[-0.5,-0.5,-0.5,0.5,0.5]
+            elif basis=='Lattice':
+                coeff=[-0.5,0.5,0.5,-0.5,-0.5]
+    return coeff
+
+def arg_check(param,basis,scheme,projscheme,ansatz):
+    boolExit=False #check variables and exit if at least one wrong
+    if param not in ['R','B']:
+        print("Error: param is " + str(param) + ": must be 'R' or 'B'")
+        boolExit=True
+    if basis not in ['SUSY','Lattice']:
+        print("Error: basis is " + str(basis) + ": must be 'SUSY' or 'Lattice'")
+        boolExit=True
+    if scheme not in ['MOM','ms']:
+        print("Error: schem is " + str(scheme) + ": must be 'MOM' or 'ms'")
+        boolExit=True
+    if projscheme not in ['qq','gg']:
+        print("Error: projscheme is " + str(projscheme) + ": must be 'qq' or 'gg'")
+        boolExit=True
+    if boolExit==True:
+        print("Exiting program")
+        sys.exit(-1)
+
+def createDir(savelocation):
+    #check the save location exists and if not creat it
+    if not os.path.exists(os.path.dirname(savelocation)):
+        try:
+            os.makedirs(os.path.dirname(savelocation))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
 
 
