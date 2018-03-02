@@ -31,8 +31,7 @@ class Renormalisation:
         #define the normalisations N, dependent on basis
         self.N_ren = [8.0/3,4.0/3,-2.0,5.0/3,1.0] #This is the factor in the bag parameter
         #self.N = [8.0/3,-5.0/3,1.0/3,2.0,2.0/3]
-        self.T = [ [np.array([[1,0,0,0,0],[0,0,0,1,0],[0,0,0,-0.5,0.5],[0,0,1,0,0],[0,-0.5,0,0,0]])
-], [np.identity(5) ] ][ibasis]
+        self.T = [ [np.array([[1,0,0,0,0],[0,0,0,1,0],[0,0,0,-0.5,0.5],[0,0,1,0,0],[0,-0.5,0,0,0]])], [np.identity(5) ] ][ibasis]
         self.N=np.squeeze(np.dot(self.T,self.N_ren))
 
         self.Mkphys = 0.5*(493.677+497.614)*pow(10,-3)
@@ -45,9 +44,18 @@ class Renormalisation:
         for i in range(5):
             print self.bZ_scheme[i,0,-1],self.bZ_scheme[i,1,-1],self.bZ_scheme[i,2,-1],self.bZ_scheme[i,3,-1],self.bZ_scheme[i,4,-1]
 
-        print("Z_V/A - ".self.ZA)
-
-        print("Z_S/P - ".self.ZP)
+        print "Z_bk/(Z[0,0]*ZP^2) - "
+        for i in range(5):
+            print self.bZ_scheme[i,0,-1]/pow(self.ZP[-1],2),self.bZ_scheme[i,1,-1]/pow(self.ZP[-1],2),self.bZ_scheme[i,2,-1]/pow(self.ZP[-1],2),self.bZ_scheme[i,3,-1]/pow(self.ZP[-1],2),self.bZ_scheme[i,4,-1]/pow(self.ZP[-1],2)
+        
+        try:
+            print("Z_V/A - ",self.ZA[-1])
+        except:
+            print ""
+        try:
+            print("Z_S/P - ",self.ZP[-1])
+        except:
+            print ""
 
 
     def read_renorm_factors(self):

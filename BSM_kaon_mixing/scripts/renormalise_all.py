@@ -102,12 +102,10 @@ for ibas in range(2):
             ikin=2
             ibas=0
             print ['E','qq','gg'][ikin], ['SUSY','Lattice'][ibas], ['MOM','ms'][ischeme]
-            '''
             main(24,False,ikin,ibas,ischeme)
             main(32,False,ikin,ibas,ischeme)
             main(48,True,ikin,ibas,ischeme)
             main(64,True,ikin,ibas,ischeme)
             main(32,True,ikin,ibas,ischeme)
             main(48,False,ikin,ibas,ischeme,fine=True)
-            '''
             main(48,True,ikin,ibas,ischeme,fine=True)

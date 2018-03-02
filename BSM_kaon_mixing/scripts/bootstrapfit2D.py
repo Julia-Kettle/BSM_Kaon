@@ -67,7 +67,7 @@ class BootstrapFit2D(object):
         name='phys'
 
         for i in range(self.nboots+1):
-            dpPhys=DataPoint(group,name,x1_phys,x2_phys,byphys,eyphys)
+            dpPhys=DataPoint(group,name,x1_phys,x2_phys,byphys[i],eyphys)
             self.dslist[i].append(dpPhys)
 
     ##########################################################################################

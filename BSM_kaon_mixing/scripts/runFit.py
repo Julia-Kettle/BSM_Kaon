@@ -127,6 +127,7 @@ def plotFit(fitObj,xlabel,ylabel,paramfile,savefile):
 
     #save figure
     fig.savefig(savefile, format='pdf')
+    plt.close(fig)
 
 #main 
 #loops through scheme, basis, proj etc options
@@ -156,15 +157,19 @@ def main():
 
     #loop through the basis, final scheme, projection scheme & parameter & fit ansatz
     # performing a bootstrapped fit for each case
-    for basis in ['SUSY','Lattice']:
+    for basis in ['SUSY']:#,'Lattice']:
 
         #set up texTemplate buffer - one fit texfile per basis
         texTemplate_buffer=texTemplate
 
         for scheme in ['MOM','ms']:
             for projscheme in ['gg','qq']:
-                for param in ['B','R']:
+                for param in ['R','B']:
                     for ansatz in ['linear','chiral']:
+
+                        print "--------------------------------------------------------------------------"
+                        print "--------------",scheme,projscheme,param,ansatz,"-----------------"
+                        print "--------------------------------------------------------------------------"
 
                         # load data from file if exists
                         try:
@@ -172,6 +177,7 @@ def main():
                             mfsq,a2,data=fetchData(param,name,ml,ms,basis,scheme,projscheme)
                             #get correct chiral log coeff
                             coeff=chiral_log_coeffs(param,ansatz,basis)
+                            print coeff
 
                         #if not set tex file to record '-' and a dummy figure
                         except:

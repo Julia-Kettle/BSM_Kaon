@@ -18,7 +18,7 @@ class DataPoint(object):
         self.msize='12'
         self.fillstyle='none'
         self.linestyle='-'
-        self.no_points=len(y)
+        #self.no_points=len(y)
 
 class DataSet(object):
     #object containing lists of plotting params and values for a number of data points of type y=f(x1,x2)
@@ -66,9 +66,9 @@ class DataSet(object):
     def __str__(self):
         #define print statement for a dataset
         #prints table of labels and values
-        string = "label            x1                 x2                  y              err\n"
+        string = "label       x1           x2           y          err\n"
         for i in range(self.no_points):
-            string+=str(self.label[i]) + "      " + str(self.x1[i])+ "      " +str(self.x2[i]) + "      " + str(self.y[i])+ "      " + str(self.ey[i])+"\n"
+            string+=str(self.label[i]) + "      " + str(round(self.x1[i],5))+ "      " +str(round(self.x2[i],5)) + "      " + str(round(self.y[i],5))+ "      " + str(round(self.ey[i],5))+"\n"
         return string
     
     def plot(self,ax,axis=0):
