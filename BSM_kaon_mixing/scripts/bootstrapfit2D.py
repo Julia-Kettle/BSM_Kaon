@@ -50,6 +50,7 @@ class BootstrapFit2D(object):
             #print(self.dslist[i].y,self.dslist[i].ey,self.dslist[i].x1,self.dslist[i].x2)
             self.bparams[i],bcovmat[i],bchisq[i],self.bchidof[i],bqvals[i] = fit.nonlinearfit(self.fitfunction,self.p_init,
             self.dslist[i].y,self.dslist[i].ey,self.dslist[i].x1,self.dslist[i].x2,self.coeff,wf=self.wf)
+    
 
     ##########################################################################################
     #takes values of x1 and x2 to return a value of y given by the fitted function for each bootstrap of the parameters
@@ -60,14 +61,21 @@ class BootstrapFit2D(object):
         eyphys=np.std(byphys)
         return byphys
 
-    def appendPhysVal(self,x1_phys,x2_phys):
+    ########################################################################################## 
+    # appends the physical fit value as a data point - allows for plotting
+    def appendPhysVal(self,x1_phys,x2_phys,colour=False,leglab=False):
         byphys=self.bootphysvalue(x1_phys,x2_phys)
         eyphys=np.std(byphys[:-1])
         group=self.dslist[-1].group[-1]+1
         name='phys'
+        legendlab = leglab if leglab else name
+
+        print(legendlab)
 
         for i in range(self.nboots+1):
-            dpPhys=DataPoint(group,name,x1_phys,x2_phys,byphys[i],eyphys)
+            dpPhys=DataPoint(group,name,x1_phys,x2_phys,byphys[i],ey=eyphys,legendlab=legendlab)
+            if colour:
+                dpPhys.colour = colour
             self.dslist[i].append(dpPhys)
 
     ##########################################################################################
@@ -95,7 +103,12 @@ class BootstrapFit2D(object):
             else:
                 print("Error: axis must be 0 or 1")
             #returns the list and the y=f(xlist,const,coeff)
-            return xlist, self.fitfunction(self.bparams[-1],x1,x2,self.coeff)
+            yfit=np.zeros([self.nboots+1,len(xlist)])
+            for iboot in range(self.nboots+1):
+                yfit[iboot] = self.fitfunction(self.bparams[iboot],x1,x2,self.coeff)
+            yerr = np.std(yfit[:-1],axis=0)
+            yfit = yfit[-1]
+            return xlist, yfit, yerr
 
     ##########################################################################################
     # plots fit lines to a provided axis ax
@@ -110,7 +123,6 @@ class BootstrapFit2D(object):
 
         xrange=ax.get_xlim()
 
-
         #constant is x2 if axis = 0 and x1 is variable and vice vers
         xconst = self.dslist[-1].x1 if axis==1 else self.dslist[-1].x2
 
@@ -121,11 +133,56 @@ class BootstrapFit2D(object):
             if xconst[i] not in constvalues:
                 #store value for above check
                 constvalues.append(xconst[i])
-                x,y=self.return_fit_line(xconst[i],xrange,axis=axis)
+                x,y,yerr=self.return_fit_line(xconst[i],xrange,axis=axis)
                 ax.plot(x,y,self.dslist[-1].linestyle[i],color=self.dslist[-1].colour[i])#,linestyle=self.dslist[-1].linestyle[i])
+            if self.dslist[-1].label[i] == "phys":
+                ax.fill_between(x,y+yerr,y-yerr,alpha=0.2,facecolor=self.dslist[-1].colour[i],edgecolor='none')
         ax.set_xlim(xrange)
+
         return ax
         #get fit line
+
+    ##########################################################################################
+    # plots single specified fit line to a provided axis ax
+    #user choose which axis (0=x1,1=x2) is varied. other is taken as datapoints values
+    def plot_fitline(self,ax,label,axis):
+        #plot a single fit_line
+        xrange=ax.get_xlim()
+        #constant is x2 if axis = 0 and x1 is variable and vice vers
+        xconst = self.dslist[-1].x1 if axis==1 else self.dslist[-1].x2
+        for i in range(len(xconst)):
+            #check we're not replicating fitline if 2 datapoints share an x value
+            if self.dslist[-1].label[i] == label:
+                x,y,yerr=self.return_fit_line(xconst[i],xrange,axis=axis)
+                ax.plot(x,y,self.dslist[-1].linestyle[i],color=self.dslist[-1].colour[i])
+        ax.set_xlim(xrange)
+        return ax
+
+
+    ##########################################################################################
+    # plot a shaded region to indicate fit line + errors
+    def plot_fitband(self,ax,label,axis):
+        #plot a fit band between fit line error bars
+        xrange=ax.get_xlim()
+        #constant is x2 if axis = 0 and x1 is variable and vice vers
+        xconst = self.dslist[-1].x1 if axis==1 else self.dslist[-1].x2
+        for i in range(len(xconst)):
+            #check we're not replicating fitline if 2 datapoints share an x value
+            if self.dslist[-1].label[i] == label:
+                x,y,yerr=self.return_fit_line(xconst[i],xrange,axis=axis)
+                ax.fill_between(x,y+yerr,y-yerr,alpha=0.2,facecolor=self.dslist[-1].colour[i],edgecolor='none')
+        ax.set_xlim(xrange)
+        return ax   
+
+    ##########################################################################################
+    # return list of residuals
+    def getResiduals(self):
+        for i in range(self.ndp):
+            res = (self.dslist[-1].y[i] - self.fitfunction(self.bparams[-1],self.dslist[-1].x1[i],self.dslist[-1].x2[i],self.coeff))/self.dslist[-1].ey[i]
+            print "residual for " + self.dslist[-1].label[i] + " is " + str(res**2)
+    
+
+
         
         
 

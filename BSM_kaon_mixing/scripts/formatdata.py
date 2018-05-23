@@ -3,6 +3,7 @@ import utils
 import file_io
 import numpy as np
 from lattice import Lattice
+import sys
 
 def calcR(matel_3p_rat,bdecay,bmass):
     """
@@ -77,7 +78,7 @@ def save_olddata(lattice):
     numpysave("../unrenormalised/m_4pif_sq_"+lattice.name+".bin",b_msq_fsq)
 
 
-def save_mydata(lattice):
+def save_mydata(lattice,latdir=""):
     """
     Reads in the new physical point bags and bare ratios
     """
@@ -111,34 +112,26 @@ def save_mydata(lattice):
             if ic == 2:     chan=str(2*ic+2)
             elif ic ==3:    chan=str(2*ic-2)
             else:           chan=str(2*ic)
-
-            filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +chan + '/3ptrat-' + mesons[0] + '/3ptrat-'+ mesons[0] +'_boots.dat'
-            filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' + chan + '/bag-' + mesons[0] + '/bag-' + mesons[0] +'_boots.dat'
+            filenameR='/Users/s1035546/FIT/'+latdir+'/fits/final/binned/uncorrelated/3ptrat/channel'+chan+'/3ptrat-'+mesons[0]+'/3ptrat-'+ mesons[0] +'.txt'
+            filenameB='/Users/s1035546/FIT/'+latdir+'/fits/final/binned/uncorrelated/bag/channel'+chan+'/bag-'+mesons[0]+'/bag-'+ mesons[0] +'.txt'
+            #filenameR='/Users/s1035546/Fits/' + lat  + '/3ptrat/channel' +chan + '/3ptrat-' + mesons[0] + '/3ptrat-'+ mesons[0] +'_boots.dat'
+            #filenameB='/Users/s1035546/Fits/' + lat  + '/bag/channel' + chan + '/bag-' + mesons[0] + '/bag-' + mesons[0] +'_boots.dat'
             #Read bag parameters and remove renormalisation - matches Nicolas' convention.
-            try:
-                file_io.read_file_array(filenameB,matel_3p_2p[ic,isea])
-                matel_3p_2p[ic,isea] = matel_3p_2p[ic,isea]/Ninv[ic]
-                print matel_3p_2p[ic,isea,:,-1]
-                #Read ratio parameters for the BSM leaving SM channel 1 as 1. 
-                if ic > 0:
-                    file_io.read_file_array(filenameR,matel_3p_rat[ic,isea])
-            except:
-                if ic > 0:
-                    file_io.read_file_array(filenameR,matel_3p_rat[ic,isea])
+            file_io.read_file_array(filenameB,matel_3p_2p[ic,isea])
+            matel_3p_2p[ic,isea] = matel_3p_2p[ic,isea]/Ninv[ic]
+            print matel_3p_2p[ic,isea,:,-1]
+            #Read ratio parameters for the BSM leaving SM channel 1 as 1. 
+            if ic > 0:
+                file_io.read_file_array(filenameR,matel_3p_rat[ic,isea])
         #read pion and kaon masses and decay constants
         for imeson in range(len(mesons)):
             #set up filenames & read data for mass and decay constant
-            try: 
-                filenamef='/Users/s1035546/Fits/' + lat + '/sim_mass/sim_mass-' + mesons[imeson] + '/decay-' + mesons[imeson] +'_boots.dat'
-                filenamem='/Users/s1035546/Fits/' + lat + '/sim_mass/sim_mass-' + mesons[imeson] + '/sim_mass-' + mesons[imeson] +'_boots.dat'
-                file_io.read_file_array(filenamem,b_M[isea,imeson])
-                file_io.read_file_array(filenamef,b_F[isea,imeson])
-            except:
-                filenamef='/Users/s1035546/Fits/' + lat + '/sim_mass_PPSS_AASS_PASL_AASL/sim_mass_PPSS_AASS_PASL_AASL-' + mesons[imeson] + '/decay-' + mesons[imeson] +'_boots.dat'
-                filenamem='/Users/s1035546/Fits/' + lat + '/sim_mass_PPSS_AASS_PASL_AASL/sim_mass_PPSS_AASS_PASL_AASL-' + mesons[imeson] + '/sim_mass_PPSS_AASS_PASL_AASL-' + mesons[imeson] +'_boots.dat'
-                file_io.read_file_array(filenamem,b_M[isea,imeson])
-                file_io.read_file_array(filenamef,b_F[isea,imeson])
-                
+            filenamef='/Users/s1035546/FIT/'+latdir+'/fits/final/binned/uncorrelated/sim_mass/sim_mass_'+mesons[imeson]+'/decay_'+ mesons[imeson] +'.txt'
+            filenamem='/Users/s1035546/FIT/'+latdir+'/fits/final/binned/uncorrelated/sim_mass/sim_mass_'+mesons[imeson]+'/sim_mass_'+ mesons[imeson] +'.txt'
+            file_io.read_file_array(filenamem,b_M[isea,imeson])
+            file_io.read_file_array(filenamef,b_F[isea,imeson])
+            print b_M[:,:,-1]
+            print b_F[:,:,-1]
             #calculate ratio of m/f for x axis data
             for iboot in range(nboots+1):
                 b_msq_fsq[isea,imeson,iboot] = pow((b_M[isea,imeson,iboot]/(4*np.pi*b_F[isea,imeson,iboot])),2)
@@ -150,6 +143,10 @@ def save_mydata(lattice):
     numpysave("../unrenormalised/f_"+lattice.name+".bin",b_F)
     numpysave("../unrenormalised/m_4pif_sq_"+lattice.name+".bin",b_msq_fsq)
 
+    for i in range(501):
+        print R[:,:,:,i]
+
+
     print R[:,:,-1]
     print matel_3p_2p[:,:,-1]
     print b_M[:,:,-1]
@@ -157,13 +154,12 @@ def save_mydata(lattice):
 
 def main():
     lat48finesmeared=Lattice(48,True,fine=True)
-    save_mydata(lat48finesmeared)
-    '''
+    save_mydata(lat48finesmeared,'48cubedfinesmeared')
     lat24=Lattice(24,False)
-    save_mydata(lat24)
+    save_mydata(lat24,'24cubed')
     print "new 24 done"
-    lat32=Lattice(32,False)
-    save_mydata(lat32)
+    #lat32=Lattice(32,False)
+    #save_mydata(lat32)
     print "new 32 done"
     #lat32=Lattice(32,False,True)
     #save_olddata(lat32)
@@ -173,17 +169,13 @@ def main():
     print "old 24 done"
     print "48 done"
     lat48=Lattice(48,True)
-    save_mydata(lat48)
-    lat48fine=Lattice(48,False,fine=True)
-    save_mydata(lat48fine)
+    save_mydata(lat48,'48cubedsmeared')
     print "48 smeared done"
-    lat64=Lattice(64,False)
-    save_mydata(lat64)
     lat64=Lattice(64,True)
-    save_mydata(lat64)
+    save_mydata(lat64,'64cubedsmeared')
     #print "64 done"
     lat32smeared=Lattice(32,True)
-    save_mydata(lat32smeared)
-    '''
+    save_mydata(lat32smeared,'32cubedsmeared')
+
 if __name__ == "__main__":
     main()

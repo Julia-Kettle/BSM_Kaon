@@ -11,6 +11,7 @@ from plot_setup import *
 import globaldefs
 from formatting import *
 from utils import *
+from plot_utils import *
 
 '''
 Julia Kettle Feb 2018
@@ -47,6 +48,7 @@ def fetchInput(inputfile):
     msizes=[]
     fillstyles=[]
     linestyles=[]
+    legendlab=[]
 
     #check at start of file
     inputfile.seek(0)
@@ -66,8 +68,9 @@ def fetchInput(inputfile):
             msizes.append(data[7])
             fillstyles.append(data[8])
             linestyles.append(data[9])
+            legendlab.append(data[10])
 
-    return name,ml,ms,group,label,colours,markers,msizes,fillstyles,linestyles
+    return name,ml,ms,group,label,colours,markers,msizes,fillstyles,linestyles,legendlab
 
 #read R/B and m,a renormalised data and return in arrays of [nchan,ndp,nboots]
 def fetchData(param,name,ml,ms,basis,scheme,projscheme):
@@ -77,19 +80,31 @@ def fetchData(param,name,ml,ms,basis,scheme,projscheme):
     ainv=[]
     a2=[]
 
+    #do2GeV=int(input("do 2GeV? : 1 or 0?"))
+    do2GeV=False
+
     for i in range(len(name)):
         #set up filenames for reading the data
         fileend=name[i]+"ml_"+ml[i]+"_ms_"+ms[i]+"_"+basis+"_"+scheme+"_"+projscheme+".bin"
         afilename="../common_data/boot_ainv_"+name[i][:2]+"cubedfine_IW_500" if ("fine" in name[i]) else "../common_data/boot_ainv_"+name[i][:2]+"cubed_IW_500"
         
-        print("fetching data from - ../renormalised/"+param+"_"+fileend)
-        print("fetch lattice spacing from - "+afilename+"\n")
+
         
         #read in data. format is lists of numpy arrays
-        data.append(np.load(open("../renormalised/"+param+"_"+fileend,'r')))
-        mfsq.append(np.load(open("../renormalised/m_4pif_sq_"+fileend,'r')))
-        ainv.append(np.array(read_file_list(afilename)))
-        a2.append(1.0/(ainv[i]*ainv[i]))
+        if not(do2GeV):
+            print("fetching data from - ../renormalised/"+param+"_"+fileend)
+            print("fetch lattice spacing from - "+afilename+"\n")
+            data.append(np.load(open("../renormalised/"+param+"_"+fileend,'r')))
+            mfsq.append(np.load(open("../renormalised/m_4pif_sq_"+fileend,'r')))
+            ainv.append(np.array(read_file_list(afilename)))
+            a2.append(1.0/(ainv[i]*ainv[i]))
+        else:
+            print("fetching data from - ../renormalised/2GeV/"+param+"_"+fileend)
+            print("fetch lattice spacing from - "+afilename+"\n")
+            data.append(np.load(open("../renormalised/2GeV/"+param+"_"+fileend,'r')))
+            mfsq.append(np.load(open("../renormalised/2GeV/m_4pif_sq_"+fileend,'r')))
+            ainv.append(np.array(read_file_list(afilename)))
+            a2.append(1.0/(ainv[i]*ainv[i]))
         
     #convert to arrays of no_points x nchan x nboots or no_points x nboots
     data=np.squeeze(np.array(data))
@@ -102,32 +117,45 @@ def fetchData(param,name,ml,ms,basis,scheme,projscheme):
     return mfsq,a2,data
 
 #plots the fits (using params in paramfile) and saves to savefile
-def plotFit(fitObj,xlabel,ylabel,paramfile,savefile):
+def plotFit(fitObj,otherAnsatzFitObj,xlabel,ylabel,paramfile,savefile):
+    print "In plotFit"
     fig = plt.figure()
     ax=fig.add_subplot(111)
 
+    print "subplot added"
     #plot central values of dataset as errorbars and fitlines
     ax=fitObj.dslist[-1].plot(ax)
     ax=fitObj.plot_fitlines(ax,0)
+    print "main fit plotted"
+    #plot other ansatz physical point results + fit line
+    ax = otherAnsatzFitObj.dslist[-1].plotOnePoint(ax,'phys')                        
+    ax = otherAnsatzFitObj.plot_fitline(ax,'phys',0)
+    print "other plotted"
     
     #read figure parameters from file
     loc,bboxloc,mode,borderPad,ncol,ticklabelsize,xlabelsize,ylabelsize,subplt_adj_l,subplt_adj_b,subplt_adj_r,subplt_adj_t=readPlotParams(paramfile)
 
-    #plot legend
-    plt.legend(loc='lower left',bbox_to_anchor=bboxloc, ncol=ncol, mode=mode, borderaxespad=borderPad)#,prop={'size':15},fontsize=12)
-
+    #draw the legend
     ax=plotVerticalLine(ax,mfsqPhys)
+    drawLegend(ax,loc,bboxloc,borderPad,ncol,mode)
+    print "legend drawn"
+    #ax=setLegend(ax,paramfile)
     #set labels and fontsize
     ax.tick_params(axis='both',labelsize = ticklabelsize)
+    ax.locator_params(nticks=4)
     ax.set_ylabel(ylabel,fontsize=ylabelsize)
     ax.set_xlabel(xlabel,fontsize=xlabelsize)
 
     #adjust subplot dimenstions
-    fig.subplots_adjust(left=subplt_adj_l,bottom=subplt_adj_b,right=subplt_adj_r,top=subplt_adj_t)
+    #fig.subplots_adjust(left=subplt_adj_l,bottom=subplt_adj_b,right=subplt_adj_r,top=subplt_adj_t)
 
     #save figure
-    fig.savefig(savefile, format='pdf')
+    fig.savefig(savefile, format='pdf')#,bbox_inches="tight")
+    print "figure saved"
     plt.close(fig)
+    print "figure closed"
+
+
 
 #main 
 #loops through scheme, basis, proj etc options
@@ -146,61 +174,65 @@ def main():
         savelocation=sys.argv[3]
 
     #read input file to determine which datapoints to include in fit
-    name,ml,ms,group,label,colours,markers,msizes,fillstyles,linestyles = fetchInput(open(inputfile,'r'))
+    name,ml,ms,group,label,colours,markers,msizes,fillstyles,linestyles,legendlab = fetchInput(open(inputfile,'r'))
     
     #read in tex template
     with open('../results/texTEMPLATE.tex','r') as contentFile:
         texTemplate=contentFile.read()
+    
+    with open('../results/tablesTEMPLATE.tex','r') as contentFile:
+        tabTemplate=contentFile.read()
 
     #check location exists and create if not
     createDir(savelocation+"/bootstraps/")
 
     #loop through the basis, final scheme, projection scheme & parameter & fit ansatz
     # performing a bootstrapped fit for each case
-    for basis in ['SUSY']:#,'Lattice']:
+    for basis in ['Lattice','SUSY']:
 
         #set up texTemplate buffer - one fit texfile per basis
         texTemplate_buffer=texTemplate
+        tabTemplate_buffer=tabTemplate
 
         for scheme in ['MOM','ms']:
             for projscheme in ['gg','qq']:
                 for param in ['R','B']:
-                    for ansatz in ['linear','chiral']:
-
-                        print "--------------------------------------------------------------------------"
-                        print "--------------",scheme,projscheme,param,ansatz,"-----------------"
-                        print "--------------------------------------------------------------------------"
-
-                        # load data from file if exists
-                        try:
-                            #print "trying to fetch data for", param, name, ml, ms, basis, scheme, projscheme
-                            mfsq,a2,data=fetchData(param,name,ml,ms,basis,scheme,projscheme)
-                            #get correct chiral log coeff
-                            coeff=chiral_log_coeffs(param,ansatz,basis)
-                            print coeff
-
-                        #if not set tex file to record '-' and a dummy figure
-                        except:
-                            #print "FAILED"
+                    try:
+                        mfsq,a2,data=fetchData(param,name,ml,ms,basis,scheme,projscheme)
+                    except:
+                        print "fetching data for " +scheme+" "+projscheme+" "+ basis+" failed"
+                        for ansatz in ['linear','chiral']:
                             for ich in range(nchan):
-
-                                #write "-" and dummy figure to texfile if cannot find data
                                 tabEntry=param+scheme+projscheme+ansatz+str(ich+1)
                                 tabEntryChi=param+scheme+projscheme+"chisq"+ansatz+str(ich+1)
                                 tabEntryPlot=param+scheme+projscheme+ansatz+"PLOT"+str(ich+1)
                                 texTemplate_buffer=texTemplate_buffer.replace(tabEntry,'-')
                                 texTemplate_buffer=texTemplate_buffer.replace(tabEntryChi,'-')
                                 texTemplate_buffer=texTemplate_buffer.replace(tabEntryPlot,'../dummy.png')
-                            
-                            #skip to next loop
-                            continue
+                                #paper tables
+                                tabTemplate_buffer=tabTemplate_buffer.replace(tabEntry,'-')
+                                tabTemplate_buffer=tabTemplate_buffer.replace(tabEntryChi,'-')
+                        continue
 
-                        #store number of channels and bootstraps(inc central)
-                        nchan = len(data)
-                        nboots = len(data[0,0])
+                    #store number of channels and bootstraps(inc central)
+                    nchan = len(data)
+                    nboots = len(data[0,0])
 
-                        #loop through channels
-                        for ich in range(nchan):
+                    for ich in range(nchan):
+                        fitList=[]
+                        datasetList=[]
+                        savefileList=[]
+                        for ansatz in ['linear','chiral']:
+                            print "--------------------------------------------------------------------------"
+                            print "--------------",scheme,projscheme,param,ich,ansatz,"-----------------"
+                            print "--------------------------------------------------------------------------"
+
+                            coeff=chiral_log_coeffs(param,ansatz,basis)
+
+                            if ansatz == 'linear':
+                                anslab='lin'
+                            elif ansatz == 'chiral':
+                                anslab='\chi^{PT}'
 
                             #create data file to save fit bootstraps
                             outDataFile=open(savelocation+"/bootstraps/"+param+str(ich+1)+"_"+basis+"_"+scheme+"_"+projscheme+"_"+ansatz+'.dat','w')
@@ -208,27 +240,34 @@ def main():
                             savefile=savelocation+"/"+savefileend
                             
                             #create bootstrap of datasets
-                            dataset=DataSet.create_bootstraps('$'+param+'_'+str(ich+1)+'$',data[ich],mfsq,a2,group,label,markers,colours,msizes,fillstyles,linestyles)
+                            dataset=DataSet.create_bootstraps('$\mathrm{'+param+'_'+str(ich+1)+'}$',data[ich],mfsq,a2,group,label,markers,colours,msizes,fillstyles,linestyles,legendlab)
                                 
                             ####################################################################################
                             #initialise and do fit, append phys result to datasets + plot
                             fit=BootstrapFit2D(dataset,globfunc_fixedlog,[1,1,1],coeff[ich])
+                            #fit=BootstrapFit2D(dataset,globfunc_a4,[1,1,1,1],coeff[ich])
                             fit.dofit()
-                            fit.appendPhysVal(mfsqPhys,aPhys)
-                            plotFit(fit,r"$m^2/(4\pi f^2)$",r""+dataset[-1].texname,"plot_pars.txt",savefile)
-                            ####################################################################################
+                            leglabPhys = "$\mathrm{"+param+"_"+str(ich+1)+"(0,m_\pi^{phys})^{"+anslab+"}}$"
+                            if ansatz == 'linear':
+                                fit.appendPhysVal(mfsqPhys,aPhys,colour='k',leglab=leglabPhys)
+                            else:
+                                fit.appendPhysVal(mfsqPhys,aPhys,leglab=leglabPhys)
+                            fitList.append(fit)
+                            datasetList.append(dataset)
+                            savefileList.append(savefile)
 
                             #save the physical value for writing to results
                             yp=fit.bootphysvalue(mfsqPhys,aPhys)
                             yperr=np.std(yp[:-1])
                             chidof=fit.bchidof
                             fitparams=fit.bparams
-
+                            fit.getResiduals()
                             #write bootstraps to txt file
                             outDataFile.write('# {0:6}\t{1:6}\t{2:6}\t{3:6}\t{4:6}\t{5:6}\n'.format('result','err','chidof','p[0]','p[1]','p[2]'))
                             for i in range(nboots):
                                 outDataFile.write('  {0:6f}\t{1:6f}\t{2:6f}\t{3:6f}\t{4:6f}\t{5:6f}\n'.format(yp[i],yperr,chidof[i],fitparams[i,0],fitparams[i,1],fitparams[i,2]))
                             print('  {0:6f}\t{1:6f}\t{2:6f}\t{3:6f}\t{4:6f}\t{5:6f}\n'.format(yp[i],yperr,chidof[-1],fitparams[-1,0],fitparams[-1,1],fitparams[-1,2]))
+                            
 
                             #create target string to be replaced in texString 
                             #e.g. RMOMgglinear1 for R1_phys(err) with linear ansatz, MOM scheme, gg projection 
@@ -246,6 +285,18 @@ def main():
                             texTemplate_buffer=texTemplate_buffer.replace("BASIS",basis)
                             texTemplate_buffer=texTemplate_buffer.replace("DATASET",stringDataSet)
 
+                            #table template
+                            tabTemplate_buffer=tabTemplate_buffer.replace(tabEntry,format_val_err(yp[-1],yperr))
+                            tabTemplate_buffer=tabTemplate_buffer.replace(tabEntryChi,str(chidof[-1])[:4])
+
+                        #allows us to plot both fit ansatz results on plot
+                        for iAnsatz in range(len(['linear','chiral'])):
+                            iOther = (iAnsatz+1)%2
+                            #plot current fit ansatz results
+                            print "iAnsatz",iAnsatz
+                            plotFit(fitList[iAnsatz],fitList[iOther],r"$m_{\pi}^2/(4\pi f_{\pi}^2)$",r""+datasetList[iAnsatz][-1].texname,figParamfile,savefileList[iAnsatz])
+                            #ax = fitList[iOther].plot_fitband(ax,'phys',0)
+
                             
                         ######################################### END OF CHANNEL LOOP #################################################
                     
@@ -260,6 +311,10 @@ def main():
         # write the corrected tex file string 
         outTexFile=open(savelocation+"/fits_"+basis+".tex",'w')
         outTexFile.write(texTemplate_buffer)
+
+               # write the corrected tex file string 
+        outTabFile=open(savelocation+"/tables_"+basis+".tex",'w')
+        outTabFile.write(tabTemplate_buffer)
                                 
     ############################################# END OF BASIS LOOP #################################################
 

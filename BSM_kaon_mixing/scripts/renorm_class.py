@@ -11,9 +11,111 @@ import utils
 import file_io
 
 
+# I want to restructure this a bit. 
+# I have the same renormalisation factors for B and R so a class makes sense. 
+# Shared values: ZBK, ZS 
+# let's have static methods to read renorm factors. 
+
 class Renormalisation:
 
-    def __init__(self,lattice,ischeme,ikin,ibasis):
+    def __init__(self,zbk,zs,zv,basis):
+        self.zbk    =   zbk
+        self.zs     =   zs
+        self.zv     =   zv
+        self.nboots =   len(zs)
+        self.basisSetUp(basis)
+
+    def basisSetUp(self,basis):
+        # set up the the normalisation factors and transformation matrix depending on basis
+        if(basis):
+            self.T=np.array([[1,0,0,0,0],[0,0,0,1,0],[0,0,0,-0.5,0.5],[0,0,1,0,0],[0,-0.5,0,0,0]])
+        else:
+            self.T=np.identity(5)
+        self.N=np.squeeze(np.dot(self.T,np.array([8.0/3,4.0/3,-2.0,5.0/3,1.0]) ))
+
+    def renorm_B(self,B):
+
+        # check dimensions, if 4th dimension due to multiple strange, renormalise each strange mass.
+        if len(np.shape(B)) == 4:
+            renB=self.renorm_multiStrange(B,self.renorm_B)
+        
+        elif len(np.shape(B)) == 3:
+            renB=np.empty_like(B)  #empty renorm matrix to fill
+            for il in range(np.size(B,1)):
+                for iboot in range(np.size(B,2)):
+                    renB[:,il,iboot] = np.dot(self.T, np.dot(self.zbk[:,:,iboot],B[:,il,iboot]) )
+                    renB[:,il,iboot] /= self.N   # divide by normalisation 
+                    # BSM elements multiplied by (ZV/ZS)^2 : Zij/ZV^2 -> Zij/ZS^2 due to different defs of matrix elems
+                    for ich in range(1,5):
+                        renB[ich,il,iboot] *= pow(self.zv[iboot],2)/pow(self.zs[iboot],2)
+        else:
+            print "Error: array should have dimensions (channels,n_lightmass,boots) or (channels,n_lightmass,n_strangemass,boots)"
+            sys.exit(-2)
+        return renB
+
+    def renorm_R(self,R):
+        #renormalizes R by multiplying with renormalisation Z_Bk.R[ich]
+        if len(np.shape(R)) == 4:
+            renR=self.renorm_multiStrange(R,self.renorm_R)
+        elif len(np.shape(R)) == 3:
+            renR=np.empty_like(R)
+            for il in range(np.size(R,1)):
+                for iboot in range(np.size(R,2)):
+                    renR[:,il,iboot] = np.dot(self.T, np.dot(self.zbk[:,:,iboot],R[:,il,iboot])/self.zbk[0,0,iboot])
+        else:
+            print "Error: array should have dimensions (channels,n_lightmass,boots) or (channels,n_lightmass,n_strangemass,boots)"
+            sys.exit(-1)
+        return renR
+
+    def renorm_multiStrange(self,mat,renFunc):
+        renmat = np.empty_like(mat)
+        for ims in range(np.size(mat,2)):
+            renmat[:,:,ims,:] = renFunc(mat[:,:,ims,:])
+        return renmat
+
+    @staticmethod
+    def readZBK(renlattice_name,scheme,kin,directory):
+        finame  =   directory + "/Z" + scheme + "_boot_mu_match_" + renlattice_name + "_" + kin + "_block.out"
+        fi      =   open(finame,'r')
+        lines   =   fi.readlines()
+        nboot   =   len(lines)/25 - 1  # where we have 5 by 5 by (nboots + 1)
+        zbk     =   np.zeros([5,5,nboot+1])  
+        i,j     =   0,0 
+        iline   =   0
+        while iline < len(lines):
+            for iboot in range(nboot+1):
+                zbk[i,j,iboot]  =   float(lines[iline])
+                iline+=1
+            # increase j by one, if j=5 increase i by 1 and j -> 0
+            j+=1
+            i+=(j)//5
+            j=j%5
+        return zbk
+    
+    @staticmethod
+    def readZS(renlattice_name,scheme,kin,directory):
+        finame  =   directory + "/Zs_" + scheme + "_boot_" + renlattice_name + "_" + kin + ".out"
+        fi      =   open(finame,'r')
+        lines   =   fi.readlines()
+        zs      =   np.zeros(len(lines))
+        for i in range(len(lines)):
+            zs[i]   =   float(lines[i])
+        return zs
+
+    @staticmethod
+    def readZV(renlattice_name,directory):
+        finame  =   directory + "/Zv_boot_" + renlattice_name + ".out"
+        fi      =   open(finame,'r')
+        lines   =   fi.readlines()
+        zv      =   np.zeros(len(lines))
+        for i in range(len(lines)):
+            zv[i]   =   float(lines[i])
+        return zv
+
+"""
+class Renormalisation:
+
+    def __init__(self,lattice,ischeme,ikin,ibasis,do2GeV=False):
         "Initialise the global variables, and those specific to this lattice"
         print "Renormalising"
         self.ikin = ikin
@@ -24,7 +126,7 @@ class Renormalisation:
         self.kin_name = ['E','qq','gg'][ikin]
         self.lattice_name = lattice.name
         self.lattice_dim = lattice.name if 'smeared' not in lattice.name else lattice.name[0:2]
-
+        self.do2GeV=do2GeV
         cnfg.nboots = 500
         cnfg.nchan=5
 
@@ -60,7 +162,6 @@ class Renormalisation:
 
     def read_renorm_factors(self):
         lattice_name_Zs = {'24':'24cubed','24smeared':'24cubed','32':'32cubed','48':'24cubed','48smeared':'24cubed','64':'32cubed','48fine':'48fine','64smeared':'32cubed','32smeared':'32cubed','48finesmeared':'48fine'}
-        Zfilename = "../data/Z" + self.scheme_name + "_boot_mu_match_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + "_block_500.out"
         Zvfilename="../data/Zv_boot_" + lattice_name_Zs[self.lattice_name]+".out"
         Zsfilename="../data/Zs_" + self.scheme_name + "_boot_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + ".out"
         #Zfilename = "../data/2GeV/Z" + self.scheme_name + "_boot_mu_match_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + "_block.out"
@@ -68,7 +169,28 @@ class Renormalisation:
         self.ZA = np.zeros([501])
         self.ZP = np.zeros([501])
 
-        file_io.read_file_array(Zfilename,self.bZ_scheme)
+        #try: #hack to get old Z
+        doOld = False
+        #hack to use 1609 version
+        doSUSYConv = False
+        if ( '24' in Zsfilename or '32' in Zsfilename)  and (doOld) and self.kin_name=='qq':
+            Zfilename = "../data/Z" + self.scheme_name + "_boot_mu_match_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + "_block.out"
+            self.bZShort=np.zeros([cnfg.nchan,cnfg.nchan,101])
+            file_io.read_file_array(Zfilename,self.bZShort)
+            self.bZ_scheme  =   np.dstack((self.bZShort[:,:,:-1],self.bZShort[:,:,:-1],self.bZShort[:,:,:-1],self.bZShort[:,:,:-1],self.bZShort))
+        elif ( '24' in Zsfilename or '32' in Zsfilename)  and (doSUSYConv) and self.kin_name=='qq' and self.scheme_name == 'MOM':
+            print "Doing SUSY CONV 1609"
+            Zfilename = "../data/Z" + self.scheme_name + "_boot_mu_match_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + "_block_500_Lattice.out"
+            file_io.read_file_array(Zfilename,self.bZ_scheme)
+        elif (self.do2GeV == True):
+            Zfilename = "../data/2GeV/Z" + self.scheme_name + "_boot_mu_match_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + "_block.out"
+            self.bZShort=np.zeros([cnfg.nchan,cnfg.nchan,101])
+            file_io.read_file_array(Zfilename,self.bZShort)
+            self.bZ_scheme  =   np.dstack((self.bZShort[:,:,:-1],self.bZShort[:,:,:-1],self.bZShort[:,:,:-1],self.bZShort[:,:,:-1],self.bZShort))
+        else:
+            print "Doing Lattice 1708"
+            Zfilename = "../data/Z" + self.scheme_name + "_boot_mu_match_" + lattice_name_Zs[self.lattice_name] + "_" + self.kin_name + "_block_500.out"
+            file_io.read_file_array(Zfilename,self.bZ_scheme)
         file_io.read_file_array(Zvfilename,self.ZA)
         file_io.read_file_array(Zsfilename,self.ZP)
 
@@ -116,12 +238,14 @@ class Renormalisation:
                             ren_B[ich,il,iboot] /= self.N[ich]
                         else:
                             ren_B[ich,il,iboot] *= ((pow(self.ZA[iboot],2))/(pow(self.ZP[iboot],2)*self.N[ich]))
+                print "B before renorm - ", B[:,il,-1]/self.N
+                print "B after renrom  - ", ren_B[:,il,-1]
         else:
             print "Error: array should have dimensions (channels,n_lightmass,boots) or (channels,n_lightmass,n_strangemass,boots)"
             sys.exit(-2)
 
         return ren_B
-
+"""
 
 
 class StrangeAdjustment:

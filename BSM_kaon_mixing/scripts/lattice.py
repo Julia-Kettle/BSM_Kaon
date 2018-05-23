@@ -9,6 +9,14 @@ class Lattice:
         self.name = str(l)
         self.name = self.name+"fine" if fine==True else self.name
         self.name = self.name+"smeared" if self.smeared==True else self.name
+
+        if fine == True:
+            self.renormname="48fine"
+        elif l==24 or l==48:
+            self.renormname="24cubed"
+        elif l==32 or l==64:
+            self.renormname="32cubed"
+
         if old == True:
             fi = open("../lattice_setup/lattice_setup_" + self.name+"_old.txt",'r')
         else:

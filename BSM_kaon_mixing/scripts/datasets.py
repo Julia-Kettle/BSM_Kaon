@@ -4,7 +4,7 @@ import globaldefs
 
 class DataPoint(object):
     #object containing plotting params and values for data type y=f(x1,x2)
-    def __init__(self,group,label,x1,x2,y,ey=0,):
+    def __init__(self,group,label,x1,x2,y,ey=0,legendlab=False):
         #initialise data point - contains values y,x1,x2 and plotting params
         self.y=y
         self.x1=x1
@@ -12,6 +12,7 @@ class DataPoint(object):
         self.ey=ey
         self.group=group
         self.label=label
+        self.legendlab=label if not legendlab else legendlab
         #set default colour and marker
         self.marker='o'
         self.colour='m'
@@ -24,7 +25,7 @@ class DataSet(object):
     #object containing lists of plotting params and values for a number of data points of type y=f(x1,x2)
     #contains functionality to create, append, create a set of bootstraps of Datasets and return the minimums and maximums
     
-    def __init__(self,name,y,yerr,x1,x2,group,label,marker,colour,msize,fillstyle,linestyle):
+    def __init__(self,name,y,yerr,x1,x2,group,label,marker,colour,msize,fillstyle,linestyle,legendlab=False):
         #initialise data set - contains lists of datapoint values y,x1,x2 and plotting params
         #label of dataset in latex formatting
         self.texname=name
@@ -40,6 +41,7 @@ class DataSet(object):
         self.group=group
         #label each datapoint - for legend on plot
         self.label=label
+        self.legendlab=legendlab if legendlab else label
 
         #plotting params
         self.marker=marker
@@ -56,6 +58,7 @@ class DataSet(object):
         self.x2=np.append(self.x2,point.x2)
         self.group=np.append(self.group,point.group)
         self.label=np.append(self.label,point.label)
+        self.legendlab=np.append(self.legendlab,point.legendlab)
         self.colour=np.append(self.colour,point.colour)
         self.marker=np.append(self.marker,point.marker)
         self.msize=np.append(self.msize,point.msize)
@@ -76,8 +79,20 @@ class DataSet(object):
             x=self.x2 if (axis==1) else self.x1
             for i in range(self.no_points):
                 ax.errorbar(x[i],self.y[i],yerr=self.ey[i],ecolor=self.colour[i],color=self.colour[i],
-                fmt=self.marker[i],fillstyle=self.fillstyle[i],markersize=self.msize[i],label=self.label[i])
+                fmt=self.marker[i],fillstyle=self.fillstyle[i],markersize=self.msize[i],label=r""+self.legendlab[i]+"" )
             return ax
+    
+    def plotOnePoint(self,ax,label,axis=0,marker=False,colour=False):
+        x=self.x2 if (axis==1) else self.x1
+        for i in range(self.no_points):
+            if self.label[i] == label:
+                if not marker:
+                    marker = self.marker[i]
+                if not colour:
+                    colour = self.colour[i]
+                ax.errorbar(x[i],self.y[i],yerr=self.ey[i],ecolor=colour,color=colour,
+                fmt=marker,fillstyle=self.fillstyle[i],markersize=self.msize[i],label=r""+self.legendlab[i] )
+        return ax
 
     def min(self,axis):
             #return minimum along chosen x1,x2 or y
@@ -128,11 +143,11 @@ class DataSet(object):
         return DataSet(name,y,x1,x2,group,label,marker,colour,msize,fillstyle)
    
     @staticmethod
-    def create_bootstraps(name,y,x1,x2,group,label,marker,colour,msize,fillstyle,linestyle):
+    def create_bootstraps(name,y,x1,x2,group,label,marker,colour,msize,fillstyle,linestyle,legendlab=False):
         #create n datasets from no_points by n arrays of y,x1,x2 and no_points lists of plot params
         nboots=(np.size(y[0]))
         bdatasets=[]
         ey=np.std(y[:,:-1],axis=1)
         for i in range(nboots):
-            bdatasets.append(DataSet(name,y[:,i],ey,x1[:,i],x2[:,i],group,label,marker,colour,msize,fillstyle,linestyle))
+            bdatasets.append(DataSet(name,y[:,i],ey,x1[:,i],x2[:,i],group,label,marker,colour,msize,fillstyle,linestyle,legendlab))
         return bdatasets
