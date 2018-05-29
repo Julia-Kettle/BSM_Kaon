@@ -161,11 +161,11 @@ def main():
     #lat32=Lattice(32,False)
     #save_mydata(lat32)
     print "new 32 done"
-    #lat32=Lattice(32,False,True)
-    #save_olddata(lat32)
+    lat32=Lattice(32,False,True)
+    save_olddata(lat32)
     print "old 32 done"
-    #lat24=Lattice(24,False,True)
-    #save_olddata(lat24)
+    lat24=Lattice(24,False,True)
+    save_olddata(lat24)
     print "old 24 done"
     print "48 done"
     lat48=Lattice(48,True)

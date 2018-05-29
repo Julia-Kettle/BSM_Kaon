@@ -73,15 +73,14 @@ def fetchInput(inputfile):
     return name,ml,ms,group,label,colours,markers,msizes,fillstyles,linestyles,legendlab
 
 #read R/B and m,a renormalised data and return in arrays of [nchan,ndp,nboots]
-def fetchData(param,name,ml,ms,basis,scheme,projscheme):
+def fetchData(param,name,ml,ms,basis,scheme,projscheme,do2GeV=False):
    
     data=[]
     mfsq=[]
     ainv=[]
     a2=[]
 
-    #do2GeV=int(input("do 2GeV? : 1 or 0?"))
-    do2GeV=False
+    
 
     for i in range(len(name)):
         #set up filenames for reading the data
@@ -163,7 +162,7 @@ def plotFit(fitObj,otherAnsatzFitObj,xlabel,ylabel,paramfile,savefile):
 #plots results to figures, saves bootstraps and writes results to tex files
 def main():
 
-    if len(sys.argv) != 4:
+    if len(sys.argv) < 4:
         #check for input files and output file
         print("Usage: python "+sys.argv[0]+" <fit input file> <figure param file> <save location of plots> ")
         sys.exit(-1)
@@ -172,6 +171,11 @@ def main():
         inputfile=sys.argv[1]
         figParamfile=sys.argv[2]
         savelocation=sys.argv[3]
+
+    try:
+        do2GeV=int(float(sys.argv[4]))
+    except:
+        do2GeV=False
 
     #read input file to determine which datapoints to include in fit
     name,ml,ms,group,label,colours,markers,msizes,fillstyles,linestyles,legendlab = fetchInput(open(inputfile,'r'))
@@ -198,7 +202,7 @@ def main():
             for projscheme in ['gg','qq']:
                 for param in ['R','B']:
                     try:
-                        mfsq,a2,data=fetchData(param,name,ml,ms,basis,scheme,projscheme)
+                        mfsq,a2,data=fetchData(param,name,ml,ms,basis,scheme,projscheme,do2GeV)
                     except:
                         print "fetching data for " +scheme+" "+projscheme+" "+ basis+" failed"
                         for ansatz in ['linear','chiral']:
@@ -244,8 +248,8 @@ def main():
                                 
                             ####################################################################################
                             #initialise and do fit, append phys result to datasets + plot
-                            fit=BootstrapFit2D(dataset,globfunc_fixedlog,[1,1,1],coeff[ich])
-                            #fit=BootstrapFit2D(dataset,globfunc_a4,[1,1,1,1],coeff[ich])
+                            #fit=BootstrapFit2D(dataset,globfunc_fixedlog,[1,1,1],coeff[ich])
+                            fit=BootstrapFit2D(dataset,globfunc_polynomial_m,[1,1,1,1],coeff[ich])
                             fit.dofit()
                             leglabPhys = "$\mathrm{"+param+"_"+str(ich+1)+"(0,m_\pi^{phys})^{"+anslab+"}}$"
                             if ansatz == 'linear':

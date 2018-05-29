@@ -8,7 +8,7 @@ from lattice import Lattice
 
 
 def getdata(lat,datadir,old=False):
-    fileend=".bin" if not(old) else "_old.bin"
+    fileend=".bin" if not(old) else "old.bin"
     m = np.load(datadir+"/m_"+str(lat)+fileend)
     f = np.load(datadir+"/f_"+str(lat)+fileend)
     m_4pif_sq = np.load(datadir+"/m_4pif_sq_"+str(lat)+fileend)
@@ -24,10 +24,11 @@ def savetext(filename,array):
     fotext.close()
 
 def savealltotext(savedir,fileend,R,B,m_4pif,f):
-        savetext(savedir+"/textformat/R_"+fileend,R)
-        savetext(savedir+"/textformat/B_"+fileend,B)
-        savetext(savedir+"/textformat/m_4pif_"+fileend,m_4pif)
-        savetext(savedir+"/textformat/f_"+fileend,f)
+    print fileend
+    savetext(savedir+"/textformat/R_"+fileend,R)
+    savetext(savedir+"/textformat/B_"+fileend,B)
+    savetext(savedir+"/textformat/m_4pif_"+fileend,m_4pif)
+    savetext(savedir+"/textformat/f_"+fileend,f)
 
 def savebinary(filename,array):
     fo  =   open(filename,'w')
@@ -40,7 +41,7 @@ def savealltobinary(savedir,fileend,R,B,m_4pif,f):
         savebinary(savedir+"/m_4pif_"+fileend,m_4pif)      
         savebinary(savedir+"/f_"+fileend,f)
 
-def strangeinterpolate(lattice,B,R,dB,dR):
+def strangeinterpolate(lattice,B,R,dB,dR,am48):
     if len(lattice.m_val_s)==1:
         if lattice.m_val_s != lattice.m_s_phys:
             if dB == None or dR ==None:
@@ -83,21 +84,28 @@ def main(lat,smeared,ikin,ibas,ischeme,dR=None,dB=None,old=False,fine=False,am48
     datadir =   "/Users/s1035546/Global_Fitting_Environment/BSM_kaon_mixing/unrenormalised"
     baredir =   datadir
     dirRenorm="/Users/s1035546/Global_Fitting_Environment/BSM_kaon_mixing/data"
-    dirZBK=dirRenorm
+    dirZBK=dirRenorm+"/"
     outdir="/Users/s1035546/Global_Fitting_Environment/BSM_kaon_mixing/renormalised"
 
-    #try:
-    m,f,m_4pif_sq,B,R   =   getdata(lat,datadir,old)
-    print "renormalising - "+scheme+" "+kin+" "+bas    
-    #except:
-    #print "failed"
-    #return
     
 
+    m,f,m_4pif_sq,B,R   =   getdata(lat,datadir,old)
+    print "renormalising - "+scheme+" "+kin+" "+bas    
+    """
+    except:
+        print "failed"
+        return
+    """
+    print np.shape(R),np.shape(B),np.shape(m_4pif_sq)
     for iml in range(len(lattice.m_sea_l)):
-        fileend=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+".txt"
-        savealltotext(baredir,fileend,R[:,iml,:],B[:,iml,:],m_4pif_sq[iml,-1,:],f[iml,-1,:])
-
+        if not(old):
+            fileend=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+".txt"
+            savealltotext(baredir,fileend,R[:,iml,:],B[:,iml,:],m_4pif_sq[iml,-1,:],f[iml,-1,:])
+        else:
+            for ims in range(len(lattice.m_val_s)):
+                print m_4pif_sq[:,:,-1,-1]
+                fileend=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_val_s[ims])+"_"+bas+"old.txt"
+                savealltotext(baredir,fileend,R[:,iml,ims,:],B[:,iml,ims,:],m_4pif_sq[0,iml,-1,:],f[0,iml,-1,:])
 
 
     #read the renorm files
@@ -105,25 +113,35 @@ def main(lat,smeared,ikin,ibas,ischeme,dR=None,dB=None,old=False,fine=False,am48
     zs=Renormalisation.readZS(lattice.renormname,scheme,kin,dirRenorm)
     zv=Renormalisation.readZV(lattice.renormname,dirRenorm)
 
-    B,R,dB,dR=strangeinterpolate(lattice,B,R,dB,dR)
+    B,R,dB,dR=strangeinterpolate(lattice,B,R,dB,dR,am48)
+
+    print "R bare - ", R[:,:,-1]
+    print "error  - ", np.std(R[:,:,:-1],axis=2)
 
     renorm = Renormalisation(zbk,zs,zv,boolSUSY)
     R=renorm.renorm_R(R)
     B=renorm.renorm_B(B)
 
+    print "R renormalised - ", R[:,:,-1]
+    print "error  - ", np.std(R[:,:,:-1],axis=2)
 
+    
 
     for iml in range(len(lattice.m_sea_l)):
-        print "saving to ","../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w'
         if not(old):
-            fileendbin=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+".bin"
-            fileendtxt=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+".txt"
+            print "saving to ","../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin",'w'
+            fileendbin=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".bin"
+            fileendtxt=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+".txt"
+            savealltotext(outdir,fileendtxt,R[:,iml,:],B[:,iml,:],m_4pif_sq[iml,-1,:],f[iml,-1,:]) 
+            savealltobinary(outdir,fileendbin,R[:,iml,:],B[:,iml,:],m_4pif_sq[iml,-1,:],f[iml,-1,:]) 
         else:
-            fileendbin=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_old.bin"
-            fileendtxt=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_old.txt"
+            print "saving to ","../renormalised/B_"+str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+"_old.bin",'w'
+            fileendbin=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+"_old.bin"
+            fileendtxt=str(lattice.name)+"ml_"+str(lattice.m_sea_l[iml])+"_ms_"+str(lattice.m_s_phys[0])+"_"+bas+"_"+scheme+"_"+kin+"_old.txt"
+            savealltotext(outdir,fileendtxt,R[:,iml,:],B[:,iml,:],m_4pif_sq[0,iml,-1,:],f[0,iml,-1,:])
+            savealltobinary(outdir,fileendbin,R[:,iml,:],B[:,iml,:],m_4pif_sq[0,iml,-1,:],f[0,iml,-1,:]) 
 
-        savealltotext(outdir,fileendtxt,R[:,iml,:],B[:,iml,:],m_4pif_sq[iml,-1,:],f[iml,-1,:]) 
-        savealltobinary(outdir,fileendbin,R[:,iml,:],B[:,iml,:],m_4pif_sq[iml,-1,:],f[iml,-1,:]) 
+
 
     return dB,dR
 
@@ -133,9 +151,14 @@ for ibas in range(2):
             #ikin=2
             #ibas=0
             print ['E','qq','gg'][ikin], ['SUSY','Lattice'][ibas], ['MOM','ms'][ischeme]
+            main(24,False,ikin,ibas,ischeme,old=True)
+            main(32,False,ikin,ibas,ischeme,old=True)
+            exit
             main(24,False,ikin,ibas,ischeme)
             main(32,False,ikin,ibas,ischeme)
+            #main(48,False,ikin,ibas,ischeme)
             main(48,True,ikin,ibas,ischeme)
+            #main(64,False,ikin,ibas,ischeme)
             main(64,True,ikin,ibas,ischeme)
             main(32,True,ikin,ibas,ischeme)
             main(48,False,ikin,ibas,ischeme,fine=True)
